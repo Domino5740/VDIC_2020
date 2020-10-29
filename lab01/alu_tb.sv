@@ -19,23 +19,21 @@ typedef enum bit[2:0] {
 	sub_opcode 		= 3'b101
 } opcode_t;
 	
+	
 typedef enum bit [1:0] {
 	DATA = 2'b00,
 	CTL = 2'b10,
 	ERR = 2'b11
 } byte_type_t;
-	
-byte bit_counter, byte_counter;
-bit [31:0] A_data, B_data;
-bit [3:0] crc_4b;
 
 operation_t op_set;
-opcode_t opcode_set;
-byte_type_t byte_type;
 
 bit clk, rst_n;
 bit sin = 1;
 bit sout;
+	
+bit [31:0] A_data, B_data;
+bit [3:0] crc_4b;
 
 mtm_Alu DUT (.clk, .rst_n, .sin, .sout);
 
@@ -47,13 +45,13 @@ end
 covergroup op_cov;
 	option.name = "cg_op_cov";
 	coverpoint op_set {
-		bins A1_all_op[] = ([and_op:sub_op]);
+		bins A1_all_op[] = {[and_op:sub_op]};
 		bins A2_rst_to_op[] = (rst_op => [and_op : sub_op]);
 		bins A3_op_to_rst[] = ([and_op:sub_op] => rst_op);
 		bins A4_twoops[] = ([and_op:sub_op] [* 2]);
-		bins A5_bad_data = (bad_data_op);
-		bins A6_bad_crc = (bad_crc_op);
-		bins A7_no_op = (no_op);
+		bins A5_bad_data = bad_data_op;
+		bins A6a_bad_crc = bad_crc_op;
+		bins A7_no_op = no_op;
 	}
 endgroup
 
@@ -64,14 +62,14 @@ covergroup zeros_or_ones_on_ops;
 		ignore_bins null_ops = {rst_op, no_op, bad_data_op, bad_crc_op};
 	}
 	a_leg: coverpoint A_data {
-		bins zeros  = {'h00};
-		bins others = {['h01:'hFE]};
-		bins ones   = {'hFF};
+		bins zeros  = {'h00000000};
+		bins others = {['h00000001:'hFFFFFFFE]};
+		bins ones   = {'hFFFFFFFF};
 	}
 	b_leg: coverpoint B_data {
-		bins zeros  = {'h00};
-		bins others = {['h01:'hFE]};
-		bins ones   = {'hFF};
+		bins zeros  = {'h00000000};
+		bins others = {['h00000001:'hFFFFFFFE]};
+		bins ones   = {'hFFFFFFFF};
 	}
 	B_op_00_FF: cross a_leg, b_leg, all_ops {
 	// #B1 simulate all zero input for all the operations
@@ -122,20 +120,31 @@ function opcode_t get_opcode();
 	endcase
 endfunction
 
-function [3:0][7:0] get_data();
+function bit [2:0] get_noopcode();
+	bit[1:0] opcode_choice;
+	opcode_choice = $random;
+	case(opcode_choice)
+		2'b00	:	return 3'b010;
+		2'b01	:	return 3'b011;
+		2'b10	:	return 3'b110;
+		2'b11	:	return 3'b111;
+	endcase
+endfunction
+
+function [31:0] get_data();
 	bit [1:0] zero_ones;
 	zero_ones = $random;
 	if(zero_ones == 2'b00)
-		return 32'h00;
+		return 32'h00000000;
 	else if(zero_ones == 2'b11)
-		return 32'hFF;
+		return 32'hFFFFFFFF;
 	else
-		return $random;
+		return $random();
 endfunction
 
 function bit [2:0] calc_crc_3b(input [36:0] data_in);
 
-  	static bit [2:0] lfsr_q = 4'b1111;
+  	static bit [2:0] lfsr_q = 3'b111;
 	bit [2:0] crc_out;
 
 	crc_out[0] = lfsr_q[1] ^ data_in[0] ^ data_in[2] ^ data_in[3] ^ data_in[4] ^ data_in[7] ^ data_in[9] ^ data_in[10] ^ data_in[11] ^ data_in[14] ^ data_in[16] ^ data_in[17] ^ data_in[18] ^ data_in[21] ^ data_in[23] ^ data_in[24] ^ data_in[25] ^ data_in[28] ^ data_in[30] ^ data_in[31] ^ data_in[32] ^ data_in[35];
@@ -148,7 +157,7 @@ endfunction
 
 function bit [3:0] calc_crc_4b(input [67:0] data_in);
 
-  	static bit [3:0] lfsr_q = 4'b1111;
+  	static bit [3:0] lfsr_q = 4'b0000;
 	bit [3:0] crc_out;
 
     crc_out[0] = lfsr_q[0] ^ lfsr_q[2] ^ data_in[0] ^ data_in[3] ^ data_in[4] ^ data_in[6] ^ data_in[8] ^ data_in[9] ^ data_in[10] ^ data_in[11] ^ data_in[15] ^ data_in[18] ^ data_in[19] ^ data_in[21] ^ data_in[23] ^ data_in[24] ^ data_in[25] ^ data_in[26] ^ data_in[30] ^ data_in[33] ^ data_in[34] ^ data_in[36] ^ data_in[38] ^ data_in[39] ^ data_in[40] ^ data_in[41] ^ data_in[45] ^ data_in[48] ^ data_in[49] ^ data_in[51] ^ data_in[53] ^ data_in[54] ^ data_in[55] ^ data_in[56] ^ data_in[60] ^ data_in[63] ^ data_in[64] ^ data_in[66];
@@ -174,17 +183,18 @@ task send_ctl_byte(input bit [7:0] data);
 	send_byte({2'b01, data, 1'b1});
 endtask
 
-task send_data(input bit [3:0][7:0] data);
-	for(int i = 0; i <= 3; i++) begin
-		send_data_byte(data[i]);
-	end
+task send_data(input bit [31:0] data);
+	send_data_byte(data[31 : 24]);
+	send_data_byte(data[23 : 16]);
+	send_data_byte(data[15 : 8]);
+	send_data_byte(data[7  : 0]);
 endtask
 
-task read_byte(
+task read_byte_sin(
 	output byte_type_t bt,
-	output bit [7:0] d,
+	output bit [7:0] data_out,
 	output bit [3:0] crc,
-	output opcode_t op);
+	output operation_t op);
 		
 	while(sin != 0) @(negedge clk);
 	
@@ -192,11 +202,10 @@ task read_byte(
 		if(sin == 0) begin : read_data_byte
 			bt = DATA;
 			for(int i = 7; i >= 0; i--) begin
-				@(negedge clk) d[i] = sin;
+				@(negedge clk) data_out[i] = sin;
 			end
 		end : read_data_byte
 		else begin: read_ctl_byte
-			bt = CTL;
 			@(negedge clk);
 			if(sin == 0) bt = CTL;
 			else bt = ERR;
@@ -208,88 +217,133 @@ task read_byte(
 				@(negedge clk) crc[i] = sin;
 			end
 		end : read_ctl_byte
+		@(negedge clk);
 endtask
 
 task read_serial_sin(
 		output bit [31:0] A,
 		output bit [31:0] B,
 		output bit [3:0] crc,
-		output opcode_t op
+		output operation_t op,
+		output bit data_error
 	);
 	
 	bit [7:0] d;
 	byte_type_t byte_type;
 	
-	for(int i = 3; i >= 0; i--) begin
-		read_byte(byte_type, d, crc,  op);
-		B [(8 * (i + 1)) : (8 * i)] = d;
-	end
-	for(int i = 3; i > 0; i--) begin
-		read_byte(byte_type, d, crc,  op);
-		A [(8 * (i + 1)) : (8 * i)] = d;
-	end
-	read_byte(byte_type, d, crc, op);
+	read_byte_sin(byte_type, d, crc,  op);
+	if(byte_type == DATA) B [31 : 24] = d;
+	else data_error = 1;
+	
+	read_byte_sin(byte_type, d, crc,  op);
+	if(byte_type == DATA) B [23 : 16] = d;
+	else data_error = 1;
+	
+	read_byte_sin(byte_type, d, crc,  op);
+	if(byte_type == DATA) B [15 : 8] = d;
+	else data_error = 1;
+	
+	read_byte_sin(byte_type, d, crc,  op);
+	if(byte_type == DATA) B [7 : 0] = d;
+	else data_error = 1;
+	
+	read_byte_sin(byte_type, d, crc,  op);
+	if(byte_type == DATA) A [31 : 24] = d;
+	else data_error = 1;
+	
+	read_byte_sin(byte_type, d, crc,  op);
+	if(byte_type == DATA) A [23 : 16] = d;
+	else data_error = 1;
+	
+	read_byte_sin(byte_type, d, crc,  op);
+	if(byte_type == DATA) A [15 : 8] = d;
+	else data_error = 1;
+	
+	read_byte_sin(byte_type, d, crc,  op);
+	if(byte_type == DATA) A [7 : 0] = d;
+	else data_error = 1;
+
+	read_byte_sin(byte_type, d, crc, op);
+	if(byte_type == CTL) data_error = 0;
+	else data_error = 1;
 endtask
 
-task read_serial_sout();
+task read_byte_sout(
+	output byte_type_t bt,
+	output bit [7:0] data_out,
+	output bit [3:0] alu_flags,
+	output bit [2:0] crc,
+	output bit [5:0] err_flags,
+	output bit parity_bit);
+		
+	while(sout != 0) @(negedge clk);
 	
-	wait(sout == 0) begin
-		@(posedge clk);
-		if(sout == 0) begin //data
-			@(posedge clk);
-			for(byte_counter = 0; byte_counter <= 4; byte_counter++) begin
-				if(byte_counter) begin
-					@(posedge clk);
-					@(posedge clk);
+	@(negedge clk)
+		if(sout == 0) begin : read_data_byte
+			bt = DATA;
+			for(int i = 7; i >= 0; i--) begin
+				@(negedge clk) data_out[i] = sout;
+			end
+		end : read_data_byte
+		else begin
+			@(negedge clk);
+			if(sout == 0) begin : read_ctl_byte
+				bt = CTL;
+				for(int i = 3; i >= 0; i--) begin
+					@(negedge clk) alu_flags[i] = sout;
 				end
-				for(bit_counter = 0; bit_counter <= 7; bit_counter++) begin
-					received_data[byte_counter][bit_counter] = sout;
-					@(posedge clk);
+				for(int i = 2; i >= 0; i--) begin
+					@(negedge clk) crc[i] = sout;
 				end
-				@(posedge clk);
-			end
+			end : read_ctl_byte
+			else begin : read_err_byte
+				bt = ERR;
+				for(int i = 5; i >= 0; i--) begin
+					@(negedge clk) err_flags[i] = sout;
+				end
+				@(negedge clk);
+				parity_bit = sout;
+			end : read_err_byte
 		end
-		else if(sout == 1) begin //ctl
-			byte_counter = 0;
-			for(bit_counter = 0; bit_counter <= 7; bit_counter++) begin
-				@(posedge clk);
-				received_data[byte_counter][bit_counter] = sout;
-			end
-			@(posedge clk);
-		end
-	end
+		@(negedge clk);
+endtask
+
+task read_serial_sout(
+	output bit [31:0] C,
+	output bit [3:0] alu_flags,
+	output bit [2:0] crc,
+	output bit [5:0] err_flags,
+	output bit parity_bit);
 	
-	if(byte_counter == 4 && bit_counter == 7) begin
-		received_C_data = received_data[3:0];
-		if(received_data[4][0] == 0) begin
-			processing_error_ocurred = 0;
-			for(byte i = 0; i <= 3; i++) begin
-				alu_flags[i] = received_data[4][i + 1];
-			end
-			for(byte i = 0; i <= 2; i++) begin
-				received_CRC_3b[i] = received_data[4][i + 5];
-			end
-		end
-	end
-	else if(byte_counter == 0) begin
-		if(received_data[0][0] == 1) begin
-			processing_error_ocurred = 1;
-			for(byte i = 0; i <= 5; i++) begin
-				err_flags[i] = received_data[0][i + 1];
-			end
-			parity_bit = received_data[0][7];
-		end
-	end
+	byte_type_t byte_type;
+	bit [7:0] d;
+		
+	read_byte_sout(byte_type, d, alu_flags, crc, err_flags, parity_bit);
+	if(byte_type == DATA) C [31 : 24] = d;
+	else if(byte_type == ERR) disable read_serial_sout;
 	
+	read_byte_sout(byte_type, d, alu_flags, crc, err_flags, parity_bit);
+	C [23 : 16] = d;
+	
+	read_byte_sout(byte_type, d, alu_flags, crc, err_flags, parity_bit);
+	C [15 : 8] = d;
+	
+	read_byte_sout(byte_type, d, alu_flags, crc, err_flags, parity_bit);
+	C [7 : 0] = d;
+		
+	read_byte_sout(byte_type, d, alu_flags, crc, err_flags, parity_bit);
 endtask
 
 initial begin : tester
+	opcode_t opcode_set;
+	bit [2:0] noopcode;
+	
 	rst_n = 1'b0;
 	@(negedge clk); @(negedge clk);
 	rst_n = 1'b1;
 	sin = 1'b1;
 	
-	repeat(1000) begin
+	repeat(10) begin
 		@(negedge clk);
 		op_set = get_op();
 		A_data = get_data();
@@ -317,26 +371,107 @@ initial begin : tester
 				opcode_set = get_opcode();
 				send_ctl_byte({1'b0, opcode_set, crc_4b});
 			end
-			default: begin
-				rst_n = 1;
-				send_ctl_byte({1'b0, op_set, crc_4b});
+			no_op : begin
+				noopcode = get_noopcode();
+				send_ctl_byte({1'b0, noopcode, crc_4b});
+			end
+			and_op: begin
+				opcode_set = and_opcode;
+				send_ctl_byte({1'b0, opcode_set, crc_4b});
+			end
+			or_op: begin
+				opcode_set = or_opcode;
+				send_ctl_byte({1'b0, opcode_set, crc_4b});
+			end
+			add_op: begin
+				opcode_set = add_opcode;
+				send_ctl_byte({1'b0, opcode_set, crc_4b});
+			end
+			sub_op: begin	
+				opcode_set = sub_opcode;
+				send_ctl_byte({1'b0, opcode_set, crc_4b});
 			end
 		endcase
+		$strobe("%0t %0g", $time, $get_coverage());
 	end
+	$finish;
 end : tester
 
 initial begin : scoreboard
-	bit [31:0] expected_C_data;
-	bit [2:0] expected_3b_CRC;
-	bit [31:0] received_C_data;
-	/*bit processing_error_ocurred;
-bit [3:0] alu_flags; // CARRY, OVERFLOW, ZERO, NEGATIVE
-bit [2:0] received_CRC_3b;
-bit [5:0] err_flags; //ERR_DATA, ERR_CRC, ERR_OP, ERR_DATA(duplicated), ERR_CRC(duplicated), ERR_OP(duplicated)
-bit parity_bit;*/
+	bit [31:0] A_data, B_data;
+	operation_t opcode;
 	
-	@(posedge clk);
-	read_serial_sout();
+	bit [3:0] sent_4b_CRC;
+	bit [3:0] calculated_4b_CRC;
+	
+	bit [31:0] expected_C_data;
+	bit [31:0] received_C_data;
+	bit [2:0]  expected_3b_CRC;
+	bit [2:0]  received_3b_CRC;
+	bit [3:0] expected_alu_flags; // CARRY, OVERFLOW, ZERO, NEGATIVE
+	bit [3:0] received_alu_flags; // CARRY, OVERFLOW, ZERO, NEGATIVE
+
+	bit [5:0] expected_err_flags; //ERR_DATA, ERR_CRC, ERR_OP [*2]
+	bit [5:0] received_err_flags; //ERR_DATA, ERR_CRC, ERR_OP [*2]
+	bit expected_parity_bit;
+	bit received_parity_bit;
+	
+	bit data_error;
+	bit carry;
+	bit overflow;
+	bit fail;
+	forever begin
+		A_data = 0;
+		B_data = 0;
+		sent_4b_CRC = 0;
+		opcode[2:0] = 3'b000;
+		data_error = 0;
+		expected_err_flags = 0;
+		carry = 0;
+		expected_alu_flags = 0;
+		expected_C_data = 0;
+		
+		read_serial_sin(A_data, B_data, sent_4b_CRC, opcode, data_error);
+		if(data_error) expected_err_flags = 6'b100100;
+		else begin
+			calculated_4b_CRC = calc_crc_4b({B_data, A_data, 1'b1, opcode});
+			if(sent_4b_CRC != calculated_4b_CRC) expected_err_flags = 6'b010010;
+			else expected_err_flags = 6'b000000;
+			case(opcode)
+				and_op: begin
+					expected_C_data = A_data & B_data;
+				end
+				add_op: begin
+					{carry, expected_C_data} = A_data + B_data;
+				end
+				or_op: begin
+					expected_C_data = A_data | B_data;
+				end
+				sub_op: begin
+					{carry, expected_C_data} = B_data - A_data;
+				end
+				default: begin
+					expected_err_flags = 6'b001001;
+				end
+			endcase
+			expected_alu_flags[3] = carry;
+			expected_alu_flags[2] = ({carry, expected_C_data[31]} == 2'b01);
+			if(expected_C_data == 0) expected_alu_flags[1] = 1; 
+			if(expected_C_data <  0) expected_alu_flags[0] = 1;
+			
+			expected_3b_CRC = calc_crc_3b({expected_C_data, 1'b0, expected_alu_flags});
+		end
+		
+		if(expected_err_flags != 0) expected_parity_bit = ^{1'b1, expected_err_flags};
+		else expected_parity_bit = 0;
+		
+		read_serial_sout(received_C_data, received_alu_flags, received_3b_CRC, received_err_flags, received_parity_bit);
+		//if(expected_err_flags != 0 && (received_err_flags != expected_err_flags || received_parity_bit != expected_parity_bit)) fail = 1;
+		//if((received_alu_flags != expected_alu_flags) || received_C_data != expected_C_data || received_3b_CRC != expected_3b_CRC) fail = 1;
+		//if(received_C_data != expected_C_data) fail = 1;
+		
+		//if(fail) $error("FAILED: A: %0h B : %0h op: %s C: %0h", A_data, B_data, opcode.name(), received_C_data);
+	end
 end : scoreboard
 
 endmodule

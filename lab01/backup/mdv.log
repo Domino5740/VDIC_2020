@@ -1,0 +1,25 @@
+[INFO ] 2020-10-29 15:29:47,346 [com.cadence.mdv.imc.Main] [main] - Binding debug tools http on port: 33429
+[INFO ] 2020-10-29 15:29:51,613 [com.cadence.mdv.imc.Main] [main] - Binding debug tools http on port: 38871
+[INFO ] 2020-10-29 15:30:15,925 [com.cadence.mdv.imc.Main] [main] - Binding debug tools http on port: 46804
+[ERROR] 2020-10-29 15:30:16,116 [com.cadence.mdv.messaging.MDVASynchronicMessaging] [frontend-pool-1] - Cannot read directory 'cov_work/scope/merged_result'. Check if the directory has read permission, and rerun the command	   
+[ERROR] 2020-10-29 15:30:16,144 [com.cadence.mdv.messaging.MDVASynchronicMessaging] [frontend-pool-1] - Valid model file not found for run directory cov_work/scope/merged_result. Specify a valid run directory with correct ucm, ucd files and rerun the command.
+[INFO ] 2020-10-29 15:32:38,768 [com.cadence.mdv.imc.Main] [main] - Binding debug tools http on port: 33248
+[INFO ] 2020-10-29 15:32:42,942 [com.cadence.mdv.imc.Main] [main] - Binding debug tools http on port: 34015
+[INFO ] 2020-10-29 15:33:22,602 [com.cadence.mdv.imc.Main] [main] - Binding debug tools http on port: 33072
+[ERROR] 2020-10-29 15:33:22,805 [com.cadence.mdv.messaging.MDVASynchronicMessaging] [frontend-pool-1] - Cannot read directory 'cov_work/scope/merged_result'. Check if the directory has read permission, and rerun the command	   
+[ERROR] 2020-10-29 15:33:22,832 [com.cadence.mdv.messaging.MDVASynchronicMessaging] [frontend-pool-1] - Valid model file not found for run directory cov_work/scope/merged_result. Specify a valid run directory with correct ucm, ucd files and rerun the command.
+[INFO ] 2020-10-29 15:36:47,697 [com.cadence.mdv.imc.Main] [main] - Binding debug tools http on port: 39394
+[INFO ] 2020-10-29 15:36:51,980 [com.cadence.mdv.imc.Main] [main] - Binding debug tools http on port: 44294
+[INFO ] 2020-10-29 15:37:00,304 [com.cadence.mdv.imc.Main] [main] - Binding debug tools http on port: 45070
+[ERROR] 2020-10-29 15:37:00,481 [com.cadence.mdv.messaging.MDVASynchronicMessaging] [frontend-pool-1] - Cannot read directory 'cov_work/scope/merged_result'. Check if the directory has read permission, and rerun the command	   
+[ERROR] 2020-10-29 15:37:00,510 [com.cadence.mdv.messaging.MDVASynchronicMessaging] [frontend-pool-1] - Valid model file not found for run directory cov_work/scope/merged_result. Specify a valid run directory with correct ucm, ucd files and rerun the command.
+[INFO ] 2020-10-29 15:37:58,256 [com.cadence.mdv.imc.Main] [main] - Binding debug tools http on port: 45328
+[INFO ] 2020-10-29 15:38:03,045 [com.cadence.mdv.imc.Main] [main] - Binding debug tools http on port: 40945
+[INFO ] 2020-10-29 15:38:11,431 [com.cadence.mdv.imc.Main] [main] - Binding debug tools http on port: 43341
+[ERROR] 2020-10-29 15:38:11,648 [com.cadence.mdv.messaging.MDVASynchronicMessaging] [frontend-pool-1] - Cannot read directory 'cov_work/scope/merged_result'. Check if the directory has read permission, and rerun the command	   
+[ERROR] 2020-10-29 15:38:11,669 [com.cadence.mdv.messaging.MDVASynchronicMessaging] [frontend-pool-1] - Valid model file not found for run directory cov_work/scope/merged_result. Specify a valid run directory with correct ucm, ucd files and rerun the command.
+[INFO ] 2020-10-29 15:40:14,695 [com.cadence.mdv.imc.Main] [main] - Binding debug tools http on port: 36465
+[INFO ] 2020-10-29 15:40:18,938 [com.cadence.mdv.imc.Main] [main] - Binding debug tools http on port: 38083
+[INFO ] 2020-10-29 15:40:25,931 [com.cadence.mdv.imc.Main] [main] - Binding debug tools http on port: 43354
+[ERROR] 2020-10-29 15:40:26,109 [com.cadence.mdv.messaging.MDVASynchronicMessaging] [frontend-pool-1] - Cannot read directory 'cov_work/scope/merged_result'. Check if the directory has read permission, and rerun the command	   
+[ERROR] 2020-10-29 15:40:26,136 [com.cadence.mdv.messaging.MDVASynchronicMessaging] [frontend-pool-1] - Valid model file not found for run directory cov_work/scope/merged_result. Specify a valid run directory with correct ucm, ucd files and rerun the command.

@@ -1,0 +1,45 @@
+TOOL:	xrun	19.09-s003: Started on Oct 29, 2020 at 21:50:38 CET
+xrun
+	-f dut.f
+		mtm_Alu.vp
+	-f tb.f
+		alu_tb.sv
+	-v93
+	+nowarnDSEM2009
+	+nowarnDSEMEL
+	+nowarnCGDEFN
+	-xmlibdirname INCA_libs_gui
+	+access+r
+	+gui
+	+overwrite
+	-nocopyright
+	-coverage all
+	-covoverwrite
+	-covfile xrun_covfile.txt
+	-covtest lab01
+	-l xrun_gui.log
+
+-------------------------------------
+Relinquished control to SimVision...
+xcelium> 
+xcelium> source /cad/XCELIUM1909/tools/xcelium/files/xmsimrc
+xcelium> database -open waves -into waves.shm -default
+Created default SHM database waves
+xcelium> probe -create -shm top_TB.scoreboard.A_data top_TB.scoreboard.B_data top_TB.scoreboard.calculated_4b_CRC top_TB.scoreboard.carry top_TB.scoreboard.data_error top_TB.scoreboard.expected_3b_CRC top_TB.scoreboard.expected_C_data top_TB.scoreboard.expected_alu_flags top_TB.scoreboard.expected_err_flags top_TB.scoreboard.expected_parity_bit top_TB.scoreboard.fail top_TB.scoreboard.opcode top_TB.scoreboard.overflow top_TB.scoreboard.received_3b_CRC top_TB.scoreboard.received_C_data top_TB.scoreboard.received_alu_flags top_TB.scoreboard.received_err_flags top_TB.scoreboard.received_parity_bit top_TB.scoreboard.sent_4b_CRC top_TB.A_data top_TB.B_data top_TB.rst_n top_TB.sin top_TB.get_op.get_op top_TB.get_opcode.get_opcode top_TB.crc_4b
+Created probe 1
+xcelium> reset
+xmsim: *W,C58RST: Reset command executed. Coverage is enabled for the subsequent simulation run.  The coverage test name needs to be changed to prevent data overwrite, and any coverage control commands previously used must be reissued.
+Loaded snapshot worklib.top_TB:sv
+xcelium> run
+2060000 19.8925
+3880000 24.0591
+6120000 24.0591
+8360000 24.0591
+10380000 24.0591
+12200000 24.0591
+14220000 32.5437
+16240000 33.0645
+18060000 38.8441
+Simulation complete via $finish(1) at time 19880 NS + 0
+./alu_tb.sv:397 	$finish;
+xcelium> 

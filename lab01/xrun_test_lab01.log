@@ -1,0 +1,51 @@
+TOOL:	xrun	19.09-s003: Started on Oct 29, 2020 at 19:41:04 CET
+xrun
+	-f dut.f
+		mtm_Alu.vp
+	-f tb.f
+		alu_tb.sv
+	-v93
+	+nowarnDSEM2009
+	+nowarnDSEMEL
+	+nowarnCGDEFN
+	-xmlibdirname INCA_libs
+	+overwrite
+	-nocopyright
+	-coverage all
+	-covoverwrite
+	-covfile xrun_covfile.txt
+	-covtest lab01
+	-l xrun_test_lab01.log
+Loading snapshot worklib.top_TB:sv .................... Done
+xcelium> source /cad/XCELIUM1909/tools/xcelium/files/xmsimrc
+xcelium> run
+2060000 19.8925
+xmsim: *E,ERRSEV (./alu_tb.sv,461): (time 2420 NS).
+top_TB.scoreboard
+FAILED: A: 8484d609 B : ffffffff op: add_op C: 0
+3880000 24.0591
+6120000 24.0591
+xmsim: *E,ERRSEV (./alu_tb.sv,461): (time 6240 NS).
+top_TB.scoreboard
+FAILED: A: 52120000 B : ffff8937 op: no_op C: 0
+8360000 24.0591
+10380000 24.0591
+12200000 24.0591
+14220000 32.5437
+16240000 33.0645
+18060000 38.8441
+Simulation complete via $finish(1) at time 19880 NS + 0
+./alu_tb.sv:385 	$finish;
+xcelium> exit
+See ./cov_work/scope/lab01/icc.com file for message(s) on coverage constant object marking
+
+coverage setup:
+  workdir  :  ./cov_work
+  dutinst  :  top_TB(top_TB)
+  scope    :  scope
+  testname :  lab01
+
+coverage files:
+  model(design data) :  ./cov_work/scope/icc_513133e1_2688a1ac.ucm
+  data               :  ./cov_work/scope/lab01/icc_513133e1_2688a1ac.ucd
+TOOL:	xrun	19.09-s003: Exiting on Oct 29, 2020 at 19:41:04 CET  (total: 00:00:00)

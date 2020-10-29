@@ -1,0 +1,39 @@
+
+#
+# Mnemonic Maps
+#
+mmap new  -reuse -name {Boolean as Logic} -radix %b -contents {{%c=FALSE -edgepriority 1 -shape low}
+{%c=TRUE -edgepriority 1 -shape high}}
+mmap new  -reuse -name {Example Map} -radix %x -contents {{%b=11???? -bgcolor orange -label REG:%x -linecolor yellow -shape bus}
+{%x=1F -bgcolor red -label ERROR -linecolor white -shape EVENT}
+{%x=2C -bgcolor red -label ERROR -linecolor white -shape EVENT}
+{%x=* -label %x -linecolor gray -shape bus}}
+
+array unset createdGroup
+array set createdGroup {}
+set id [waveform add -signals [subst  {
+	{[format {top_TB.A_data[31:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {top_TB.B_data[31:0]}]}
+	} ]]
+waveform hierarchy collapse $id
+set id [waveform add -signals [subst  {
+	{[format {top_TB.rst_n}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {top_TB.sin}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {top_TB.get_op.get_op[2:0]}]}
+	} ]]
+waveform hierarchy collapse $id
+set id [waveform add -signals [subst  {
+	{[format {top_TB.get_opcode.get_opcode[2:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {top_TB.crc_4b[3:0]}]}
+	} ]]
+waveform hierarchy collapse $id
+
+waveform xview limits 0 19880000ps
