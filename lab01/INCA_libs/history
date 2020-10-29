@@ -1,0 +1,5 @@
+//
+// File created by:  xrun
+// Do not modify this file
+
+s1::(27Oct2020:17:36:58):( xrun -compile -l xrun_compile.log -f dut.f -f tb.f -v93 +nowarnDSEM2009 +nowarnDSEMEL +nowarnCGDEFN -xmlibdirname INCA_libs +overwrite -nocopyright -coverage all -covoverwrite -covfile xrun_covfile.txt )

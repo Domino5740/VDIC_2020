@@ -1,0 +1,68 @@
+TOOL:	xrun	19.09-s003: Started on Oct 27, 2020 at 17:36:58 CET
+xrun
+	-compile
+	-l xrun_compile.log
+	-f dut.f
+		mtm_Alu.vp
+	-f tb.f
+		alu_tb.sv
+	-v93
+	+nowarnDSEM2009
+	+nowarnDSEMEL
+	+nowarnCGDEFN
+	-xmlibdirname INCA_libs
+	+overwrite
+	-nocopyright
+	-coverage all
+	-covoverwrite
+	-covfile xrun_covfile.txt
+file: mtm_Alu.vp
+	module worklib.mtm_Alu:vp
+		errors: 0, warnings: 0
+		errors: 0, warnings: 0
+		errors: 0, warnings: 0
+		errors: 0, warnings: 0
+file: alu_tb.sv
+		@(negedge clk);
+		|
+xmvlog: *E,BADFCN (alu_tb.sv,147|2): illegal time/event control statement within a function or final block or analog initial block [10.3.4(IEEE)].
+		@(negedge clk);
+		|
+xmvlog: *E,BADFCN (alu_tb.sv,149|2): illegal time/event control statement within a function or final block or analog initial block [10.3.4(IEEE)].
+			@(negedge clk);
+			|
+xmvlog: *E,BADFCN (alu_tb.sv,152|3): illegal time/event control statement within a function or final block or analog initial block [10.3.4(IEEE)].
+		@(negedge clk);
+		|
+xmvlog: *E,BADFCN (alu_tb.sv,155|2): illegal time/event control statement within a function or final block or analog initial block [10.3.4(IEEE)].
+	wait(sout == 0) begin
+	   |
+xmvlog: *E,BADFCN (alu_tb.sv,162|4): illegal time/event control statement within a function or final block or analog initial block [10.3.4(IEEE)].
+		@(posedge clk);
+		|
+xmvlog: *E,BADFCN (alu_tb.sv,163|2): illegal time/event control statement within a function or final block or analog initial block [10.3.4(IEEE)].
+			@(posedge clk);
+			|
+xmvlog: *E,BADFCN (alu_tb.sv,165|3): illegal time/event control statement within a function or final block or analog initial block [10.3.4(IEEE)].
+					@(posedge clk);
+					|
+xmvlog: *E,BADFCN (alu_tb.sv,168|5): illegal time/event control statement within a function or final block or analog initial block [10.3.4(IEEE)].
+					@(posedge clk);
+					|
+xmvlog: *E,BADFCN (alu_tb.sv,169|5): illegal time/event control statement within a function or final block or analog initial block [10.3.4(IEEE)].
+					@(posedge clk);
+					|
+xmvlog: *E,BADFCN (alu_tb.sv,173|5): illegal time/event control statement within a function or final block or analog initial block [10.3.4(IEEE)].
+				@(posedge clk);
+				|
+xmvlog: *E,BADFCN (alu_tb.sv,175|4): illegal time/event control statement within a function or final block or analog initial block [10.3.4(IEEE)].
+				@(posedge clk);
+				|
+xmvlog: *E,BADFCN (alu_tb.sv,181|4): illegal time/event control statement within a function or final block or analog initial block [10.3.4(IEEE)].
+			@(posedge clk);
+			|
+xmvlog: *E,BADFCN (alu_tb.sv,184|3): illegal time/event control statement within a function or final block or analog initial block [10.3.4(IEEE)].
+	module worklib.top_TB:sv
+		errors: 13, warnings: 0
+xrun: *E,VLGERR: An error occurred during parsing.  Review the log file for errors with the code *E and fix those identified problems to proceed.  Exiting with code (status 1).
+TOOL:	xrun	19.09-s003: Exiting on Oct 27, 2020 at 17:36:58 CET  (total: 00:00:00)
