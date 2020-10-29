@@ -19,7 +19,6 @@ typedef enum bit[2:0] {
 	sub_opcode 		= 3'b101
 } opcode_t;
 	
-	
 typedef enum bit [1:0] {
 	DATA = 2'b00,
 	CTL = 2'b10,
@@ -32,7 +31,7 @@ bit clk, rst_n;
 bit sin = 1;
 bit sout;
 	
-bit [31:0] A_data, B_data;
+bit signed [31:0] A_data, B_data;
 bit [3:0] crc_4b;
 
 mtm_Alu DUT (.clk, .rst_n, .sin, .sout);
@@ -142,7 +141,7 @@ function [31:0] get_data();
 		return $random();
 endfunction
 
-function bit [2:0] calc_crc_3b(input [36:0] data_in);
+function bit [2:0] calc_crc_3b(input bit [36:0] data_in);
 
   	static bit [2:0] lfsr_q = 3'b111;
 	bit [2:0] crc_out;
@@ -155,7 +154,7 @@ function bit [2:0] calc_crc_3b(input [36:0] data_in);
 	
 endfunction
 
-function bit [3:0] calc_crc_4b(input [67:0] data_in);
+function bit [3:0] calc_crc_4b(input bit [67:0] data_in);
 
   	static bit [3:0] lfsr_q = 4'b0000;
 	bit [3:0] crc_out;
@@ -348,7 +347,6 @@ initial begin : tester
 		op_set = get_op();
 		A_data = get_data();
 		B_data = get_data();
-		crc_4b = calc_crc_4b({B_data, A_data, 1'b1, op_set});
 		sin = 1'b1;
 		@(negedge clk);
 		
@@ -364,48 +362,45 @@ initial begin : tester
 			bad_data_op: begin
 				opcode_set = get_opcode();
 				send_data_byte(A_data[0]);
-				send_ctl_byte({1'b0, opcode_set, crc_4b});
 			end
 			bad_crc_op: begin
-				crc_4b = $random();
+				crc_4b++;
 				opcode_set = get_opcode();
-				send_ctl_byte({1'b0, opcode_set, crc_4b});
 			end
 			no_op : begin
-				noopcode = get_noopcode();
+				opcode_set[3:0] = get_noopcode();
 				send_ctl_byte({1'b0, noopcode, crc_4b});
 			end
 			and_op: begin
 				opcode_set = and_opcode;
-				send_ctl_byte({1'b0, opcode_set, crc_4b});
 			end
 			or_op: begin
 				opcode_set = or_opcode;
-				send_ctl_byte({1'b0, opcode_set, crc_4b});
 			end
 			add_op: begin
 				opcode_set = add_opcode;
-				send_ctl_byte({1'b0, opcode_set, crc_4b});
 			end
 			sub_op: begin	
 				opcode_set = sub_opcode;
-				send_ctl_byte({1'b0, opcode_set, crc_4b});
 			end
 		endcase
-		$strobe("%0t %0g", $time, $get_coverage());
+		crc_4b = calc_crc_4b({B_data, A_data, 1'b1, opcode_set});
+		send_ctl_byte({1'b0, opcode_set, crc_4b});
+		#1200;
 	end
+	$strobe("%0t %0g", $time, $get_coverage());
 	$finish;
 end : tester
 
 initial begin : scoreboard
-	bit [31:0] A_data, B_data;
+	bit signed [31:0] A_data, B_data;
 	operation_t opcode;
 	
 	bit [3:0] sent_4b_CRC;
 	bit [3:0] calculated_4b_CRC;
 	
-	bit [31:0] expected_C_data;
-	bit [31:0] received_C_data;
+	bit signed [31:0] expected_C_data;
+	bit signed [31:0] received_C_data;
 	bit [2:0]  expected_3b_CRC;
 	bit [2:0]  received_3b_CRC;
 	bit [3:0] expected_alu_flags; // CARRY, OVERFLOW, ZERO, NEGATIVE
