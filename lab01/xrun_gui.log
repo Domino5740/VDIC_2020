@@ -1,4 +1,4 @@
-TOOL:	xrun	19.09-s003: Started on Oct 29, 2020 at 23:24:05 CET
+TOOL:	xrun	19.09-s003: Started on Oct 30, 2020 at 00:03:17 CET
 xrun
 	-f dut.f
 		mtm_Alu.vp
@@ -25,19 +25,22 @@ xcelium>
 xcelium> source /cad/XCELIUM1909/tools/xcelium/files/xmsimrc
 xcelium> database -open waves -into waves.shm -default
 Created default SHM database waves
-xcelium> probe -create -shm top_TB.A_data top_TB.B_data top_TB.clk top_TB.sin top_TB.sout
+xcelium> probe -create -shm top_TB.A_data top_TB.B_data top_TB.clk top_TB.crc_4b top_TB.op_set top_TB.sin top_TB.sout top_TB.rst_n top_TB.tester.opcode_set
 Created probe 1
 xcelium> run
-Simulation complete via $finish(1) at time 32320 NS + 0
-./alu_tb.sv:398 	$finish;
-xcelium> probe -create -shm top_TB.tester.opcode_set
-Created probe 2
-xcelium> probe -create -shm top_TB.calc_crc_4b.crc_out
-Created probe 3
-xcelium> reset
-xmsim: *W,C58RST: Reset command executed. Coverage is enabled for the subsequent simulation run.  The coverage test name needs to be changed to prevent data overwrite, and any coverage control commands previously used must be reissued.
-Loaded snapshot worklib.top_TB:sv
-xcelium> run
-Simulation complete via $finish(1) at time 32320 NS + 0
-./alu_tb.sv:398 	$finish;
-xcelium> 
+Simulation complete via $finish(1) at time 33200 NS + 0
+./alu_tb.sv:392 	$finish;
+xcelium> ^C
+xcelium> exit
+See ./cov_work/scope/lab01/icc.com file for message(s) on coverage constant object marking
+
+coverage setup:
+  workdir  :  ./cov_work
+  dutinst  :  top_TB(top_TB)
+  scope    :  scope
+  testname :  lab01
+
+coverage files:
+  model(design data) :  ./cov_work/scope/icc_36c79119_2688a1ac.ucm
+  data               :  ./cov_work/scope/lab01/icc_36c79119_2688a1ac.ucd
+TOOL:	xrun	19.09-s003: Exiting on Oct 30, 2020 at 00:10:50 CET  (total: 00:07:33)

@@ -335,7 +335,6 @@ endtask
 
 initial begin : tester
 	opcode_t opcode_set;
-	bit [2:0] noopcode;
 	
 	rst_n = 1'b0;
 	@(negedge clk); @(negedge clk);
@@ -364,12 +363,10 @@ initial begin : tester
 				send_data_byte(A_data[0]);
 			end
 			bad_crc_op: begin
-				crc_4b++;
 				opcode_set = get_opcode();
 			end
 			no_op : begin
 				opcode_set[3:0] = get_noopcode();
-				send_ctl_byte({1'b0, noopcode, crc_4b});
 			end
 			and_op: begin
 				opcode_set = and_opcode;
@@ -385,6 +382,7 @@ initial begin : tester
 			end
 		endcase
 		crc_4b = calc_crc_4b({B_data, A_data, 1'b1, opcode_set});
+		crc_4b = (op_set == bad_crc_op) ? crc_4b + 1 : crc_4b;
 		send_ctl_byte({1'b0, opcode_set, crc_4b});
 		#1200;
 	end

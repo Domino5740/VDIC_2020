@@ -1,4 +1,4 @@
-TOOL:	xrun	19.09-s003: Started on Oct 29, 2020 at 23:24:05 CET
+TOOL:	xrun	19.09-s003: Started on Oct 30, 2020 at 00:03:17 CET
 xrun
 	-compile
 	-l xrun_compile.log
@@ -27,4 +27,4 @@ file: mtm_Alu.vp
 file: alu_tb.sv
 	module worklib.top_TB:sv
 		errors: 0, warnings: 0
-TOOL:	xrun	19.09-s003: Exiting on Oct 29, 2020 at 23:24:05 CET  (total: 00:00:00)
+TOOL:	xrun	19.09-s003: Exiting on Oct 30, 2020 at 00:03:17 CET  (total: 00:00:00)
