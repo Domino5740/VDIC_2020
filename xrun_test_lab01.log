@@ -1,0 +1,37 @@
+TOOL:	xrun	19.09-s003: Started on Oct 30, 2020 at 14:01:23 CET
+xrun
+	-f dut.f
+		mtm_Alu.vp
+	-f tb.f
+		alu_tb.sv
+	-v93
+	+nowarnDSEM2009
+	+nowarnDSEMEL
+	+nowarnCGDEFN
+	-xmlibdirname INCA_libs
+	+overwrite
+	-nocopyright
+	-coverage all
+	-covoverwrite
+	-covfile xrun_covfile.txt
+	-covtest lab01
+	-l xrun_test_lab01.log
+Loading snapshot worklib.top_TB:sv .................... Done
+xcelium> source /cad/XCELIUM1909/tools/xcelium/files/xmsimrc
+xcelium> run
+PASSED
+Simulation complete via $finish(1) at time 3478140 NS + 0
+./alu_tb.sv:440 	$finish();
+xcelium> exit
+See ./cov_work/scope/lab01/icc.com file for message(s) on coverage constant object marking
+
+coverage setup:
+  workdir  :  ./cov_work
+  dutinst  :  top_TB(top_TB)
+  scope    :  scope
+  testname :  lab01
+
+coverage files:
+  model(design data) :  ./cov_work/scope/icc_32e2a531_114e318a.ucm
+  data               :  ./cov_work/scope/lab01/icc_32e2a531_114e318a.ucd
+TOOL:	xrun	19.09-s003: Exiting on Oct 30, 2020 at 14:01:25 CET  (total: 00:00:02)
