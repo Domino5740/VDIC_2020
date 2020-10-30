@@ -2,15 +2,15 @@
 module top_TB;
 
 typedef enum bit[2:0] {
-	no_op		= 3'b000,
-	and_op		= 3'b001,
-	or_op 		= 3'b010,
-	add_op 		= 3'b011,
-	sub_op 		= 3'b100,
-	rst_op 		= 3'b101,
-	bad_data_op = 3'b110,
-	bad_crc_op 	= 3'b111
-} operation_t;
+	no_op_test		 = 3'b000,
+	and_op_test		 = 3'b001,
+	or_op_test 		 = 3'b010,
+	add_op_test 	 = 3'b011,
+	sub_op_test 	 = 3'b100,
+	rst_op_test 	 = 3'b101,
+	bad_data_op_test = 3'b110,
+	bad_crc_op_test  = 3'b111
+} tester_op_t;
 
 typedef enum bit[2:0] {
 	and_opcode		= 3'b000,
@@ -26,14 +26,14 @@ typedef enum bit [1:0] {
 	ERR = 2'b11
 } byte_type_t;
 
-operation_t op_set;
+tester_op_t tester_op_set;
 
 bit clk, rst_n;
 bit sin = 1;
 bit sout;
 	
-bit signed [31:0] A_data, B_data;
-bit signed [3:0] crc_4b;
+bit [31:0] A_data, B_data;
+bit [3:0] crc_4b;
 
 mtm_Alu DUT (.clk, .rst_n, .sin, .sout);
 
@@ -44,22 +44,22 @@ end
 
 covergroup op_cov;
 	option.name = "cg_op_cov";
-	coverpoint op_set {
-		bins A1_all_op[] = {[and_op:sub_op]};
-		bins A2_rst_to_op[] = (rst_op => [and_op : sub_op]);
-		bins A3_op_to_rst[] = ([and_op:sub_op] => rst_op);
-		bins A4_twoops[] = ([and_op:sub_op] [* 2]);
-		bins A5_bad_data = bad_data_op;
-		bins A6a_bad_crc = bad_crc_op;
-		bins A7_no_op = no_op;
+	coverpoint tester_op_set {
+		bins A1_all_op[] = {[no_op_test:sub_op_test], bad_data_op_test, bad_crc_op_test};
+		bins A2_rst_to_op[] = (rst_op_test => [no_op_test : sub_op_test], bad_data_op_test, bad_crc_op_test);
+		bins A3_op_to_rst[] = ([no_op_test:sub_op_test], bad_data_op_test, bad_crc_op_test => rst_op_test);
+		bins A4_twoops[] = ([no_op_test:sub_op_test], bad_data_op_test, bad_crc_op_test [* 2]);
+		bins A5_bad_data = bad_data_op_test;
+		bins A6_bad_crc = bad_crc_op_test;
+		bins A7_no_op = no_op_test;
 	}
 endgroup
 
 covergroup zeros_or_ones_on_ops;
 	option.name = "cg_zeros_or_ones_on_ops";
 	
-	all_ops : coverpoint op_set {
-		ignore_bins null_ops = {rst_op, no_op, bad_data_op, bad_crc_op};
+	all_ops : coverpoint tester_op_set {
+		ignore_bins null_ops = {rst_op_test};
 	}
 	a_leg: coverpoint A_data {
 		bins zeros  = {'h00000000};
@@ -73,10 +73,23 @@ covergroup zeros_or_ones_on_ops;
 	}
 	B_op_00_FF: cross a_leg, b_leg, all_ops {
 	// #B1 simulate all zero input for all the operations
-		bins B1_add_00 = binsof (all_ops) intersect {add_op} &&
+		bins B1_add_00 = binsof (all_ops) intersect {add_op_test} &&
 						(binsof (a_leg.zeros) || binsof (b_leg.zeros));
-		bins B1_and_00 = binsof (all_ops) intersect {and_op} &&
+		bins B1_and_00 = binsof (all_ops) intersect {and_op_test} &&
 						(binsof (a_leg.zeros) || binsof (b_leg.zeros));
+		bins B1_or_00 = binsof (all_ops) intersect {or_op_test} &&
+						(binsof (a_leg.zeros) || binsof (b_leg.zeros));
+		bins B1_sub_00 = binsof (all_ops) intersect {sub_op_test} &&
+						(binsof (a_leg.zeros) || binsof (b_leg.zeros));
+	// #B2 simulate all ones input for all the operations
+		bins B2_add_ff = binsof (all_ops) intersect {add_op_test} &&
+						(binsof (a_leg.ones) || binsof (b_leg.ones));
+		bins B2_and_ff = binsof (all_ops) intersect {and_op_test} &&
+						(binsof (a_leg.ones) || binsof (b_leg.ones));
+		bins B2_or_ff = binsof (all_ops) intersect {or_op_test} &&
+						(binsof (a_leg.ones) || binsof (b_leg.ones));
+		bins B2_sub_ff = binsof (all_ops) intersect {sub_op_test} &&
+						(binsof (a_leg.ones) || binsof (b_leg.ones));
 	ignore_bins others_only = binsof(a_leg.others) && binsof(b_leg.others);
 	}
 endgroup
@@ -94,18 +107,18 @@ initial begin : coverage
 end : coverage
 
 
-function operation_t get_op();
+function tester_op_t get_op();
 	bit[2:0] op_choice;
 	op_choice = $random;
 	case(op_choice)
-		3'b000	:	return and_op;
-		3'b001	:	return or_op;
-		3'b010	:	return add_op;
-		3'b011	:	return sub_op;
-		3'b100  :	return no_op;
-		3'b101  :	return rst_op;
-		3'b110  :	return bad_data_op;
-		3'b111  :	return bad_crc_op;
+		3'b000	:	return and_op_test;
+		3'b001	:	return or_op_test;
+		3'b010	:	return add_op_test;
+		3'b011	:	return sub_op_test;
+		3'b100  :	return no_op_test;
+		3'b101  :	return rst_op_test;
+		3'b110  :	return bad_data_op_test;
+		3'b111  :	return bad_crc_op_test;
 	endcase
 endfunction
 
@@ -191,6 +204,7 @@ task read_byte_sin(
 	while(sin != 0) @(negedge clk);
 	
 	@(negedge clk)
+	
 		if(sin == 0) begin : read_data_byte
 			bt = DATA;
 			for(int i = 7; i >= 0; i--) begin
@@ -375,55 +389,55 @@ initial begin : tester
 	
 	repeat(1000) begin
 		@(negedge clk);
-		op_set = get_op();
+		tester_op_set = get_op();
 		A_data = get_data();
 		B_data = get_data();
 		@(negedge clk);
 		
-		case(op_set)
-			rst_op: begin
+		case(tester_op_set)
+			rst_op_test: begin
 				rst_n = 0;
 				for(int i = 0; i <= 99; i++) @(negedge clk);
 				rst_n = 1;
 			end
-			bad_data_op: begin
+			bad_data_op_test: begin
 				opcode_set = get_opcode();
 			end
-			bad_crc_op: begin
+			bad_crc_op_test: begin
 				opcode_set = get_opcode();
 			end
-			no_op : begin
+			no_op_test : begin
 				opcode_set = no_opcode;
 			end
-			and_op: begin
+			and_op_test: begin
 				opcode_set = and_opcode;
 			end
-			or_op: begin
+			or_op_test: begin
 				opcode_set = or_opcode;
 			end
-			add_op: begin
+			add_op_test: begin
 				opcode_set = add_opcode;
 			end
-			sub_op: begin	
+			sub_op_test: begin	
 				opcode_set = sub_opcode;
 			end
 		endcase
-		if(op_set != rst_op) begin
+		if(tester_op_set != rst_op_test) begin
 			send_data(B_data);
-			if(op_set == bad_data_op) begin
+			if(tester_op_set == bad_data_op_test) begin
 				send_data_byte(A_data[31 : 24]);
 				send_data_byte(A_data[23 : 16]);
 				send_data_byte(A_data[15 : 8]);
 			end
 			else send_data(A_data);
 			crc_4b = calc_crc_4b({B_data, A_data, 1'b1, opcode_set});
-			crc_4b = (op_set == bad_crc_op) ? crc_4b + 1 : crc_4b;
+			crc_4b = (tester_op_set == bad_crc_op_test) ? crc_4b + 1 : crc_4b;
 			send_ctl_byte({1'b0, opcode_set, crc_4b});
 		end
 		#1500;
 	end
-	$strobe("%0t %0g", $time, $get_coverage());
-	$finish;
+	$display("PASSED");
+	$finish();
 end : tester
 
 initial begin : scoreboard
@@ -503,7 +517,6 @@ initial begin : scoreboard
 		else if((received_alu_flags != expected_alu_flags) || received_C_data != expected_C_data || received_3b_CRC != expected_3b_CRC) fail = 1;
 		
 		if(fail) $error("FAILED: A: %0h B : %0h op: %s C: %0h", A_data, B_data, opcode.name(), received_C_data);
-		$display("GITARA SIEMA BYCZKU");
 	end
 end : scoreboard
 
