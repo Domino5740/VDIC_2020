@@ -2,14 +2,14 @@
 *I,MERGL1: Merging Simulation Coverage ...
 ----------------------------
 *I,MERGL1: Preparing target model ...
-*I,MERGL1: Reading model of primary run (cov_work/scope/lab01) as initial model: cov_work/scope/icc_0877608e_2688a1ac.ucm
+*I,MERGL1: Reading model of primary run (cov_work/scope/lab01) as initial model: cov_work/scope/icc_336ec087_2688a1ac.ucm
 *I,MERGL1: Target model generated successfully.
 *I,MERGL1: Projecting Simulation ucd data into the target model ...
 *I,MERGL2:   cov_work/scope/lab01:
 *I,MERGL3:       Data is projected in to the target model.
 *I,MERGL1: Writing output database cov_work/scope/merged_results:
-*I,MERGL2:   Model: cov_work/scope/merged_results/icc_0877608e_2688a1ac.ucm
-*I,MERGL2:   Data : cov_work/scope/merged_results/icc_0877608e_2688a1ac.ucd
+*I,MERGL2:   Model: cov_work/scope/merged_results/icc_336ec087_2688a1ac.ucm
+*I,MERGL2:   Data : cov_work/scope/merged_results/icc_336ec087_2688a1ac.ucd
 *I,MERGL1: No Specman coverage databases found in the runs.
 Total conflicts during target model creation: 0
 Total items not merged                      : 0
@@ -19,5 +19,5 @@ Total runs not merged                                 : 0
 *W,REPDEP: This is a legacy report and no future enhancement is planned for this report. It is recommended that you use the 'report_metrics' command and generate a dynamic report.
 name                                     Overall Average      Overall Covered      Code Average         Code Covered         Fsm Average          Fsm Covered          Functional Average   Functional Covered   
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-top_TB                                   30.34%               47.01% (267/568/293) 40.79%               51.89% (261/503/293) n/a                  n/a                  19.89%               9.23% (6/65)         
-|--DUT                                   19.64%               19.64% (11/56)       19.64%               19.64% (11/56)       n/a                  n/a                  n/a                  n/a                  
+top_TB                                   97.31%               92.88% (861/927)     94.63%               92.50% (814/880)     n/a                  n/a                  100.00%              100.00% (47/47)      
+|--DUT                                   98.21%               98.21% (55/56)       98.21%               98.21% (55/56)       n/a                  n/a                  n/a                  n/a                  
