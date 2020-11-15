@@ -24,5 +24,10 @@ typedef enum bit [1:0] {
 	CTL = 2'b10,
 	ERR = 2'b11
 } byte_type_t;
+	
+`include "coverage.svh"
+`include "tester.svh"
+`include "scoreboard.svh"
+`include "testbench.svh"
 
-endpackage
+endpackage : alu_pkg
