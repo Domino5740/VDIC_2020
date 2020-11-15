@@ -11,14 +11,13 @@
 
 #------------------------------------------------------------------------------
 # The list of tests; in GUI mode only the first test is started.
-TESTS=(lab01);
+TESTS=(lab02_2A);
 #------------------------------------------------------------------------------
 # MAIN
 function main(){
   xrun_compile
   xrun_elaborate
   xrun_run_all_tests
-  run_imc
 }
 #------------------------------------------------------------------------------
 # local variables#<<<
@@ -37,15 +36,13 @@ done
 #------------------------------------------------------------------------------
 # init #<<<
 rm -rf $INCA      # remove previous database
-rm -rf cov_work   # remove previous coverage results
 cols=`tput cols`
 separator=`perl -e "print \"#\" x $cols"`
 #>>>
 #------------------------------------------------------------------------------
 # simulator arguments #<<<
 XRUN_ARGS="\
-  -f dut.f \
-  -f tb.f \
+  ./shapes.sv \
   -v93 \
   +nowarnDSEM2009 \
   +nowarnDSEMEL \
@@ -54,9 +51,6 @@ XRUN_ARGS="\
   $GUI \
   +overwrite \
   -nocopyright \
-  -coverage all \
-  -covoverwrite \
-  -covfile xrun_covfile.txt \
 "
 #>>>
 #------------------------------------------------------------------------------
@@ -101,9 +95,7 @@ function xrun_elaborate() { #<<<
 function xrun_run_all_tests() { #<<<
   if [[ "$GUI" != "" ]] ; then
       xrun $XRUN_ARGS \
-        -covtest ${TESTS[0]} \
         -l xrun_gui.log
-#        +UVM_TESTNAME=${TESTS[0]} \
   else  
     TEST_LIST=""
 
@@ -122,28 +114,6 @@ function xrun_run_all_tests() { #<<<
   fi
 } #>>>
 #------------------------------------------------------------------------------
-function run_imc { #<<<
-  xrun_info "# Running imc."
-  #------------------------------------------------------------------------------
-  # print the coverage results summary (non-GUI mode)
-  if [[ "$GUI" == "" ]] ; then
-
-    # merging the coverage results from different tests
-    imc -nocopyright -batch -initcmd \
-      "load -run $TEST; merge -out merged_results $TEST_LIST; exit" |& tee xrun_cov.rpt
-    xrun_check_status $? "IMC MERGE"
-
-    # printing the summary
-    imc -nocopyright -batch -initcmd \
-      "load -run merged_results; report -summary; exit" |& tee -a xrun_cov.rpt
-    xrun_check_status $? "IMC REPORT"
-
-    xrun_info "\
- The coverage report was saved to xrun_cov.rpt file.
- To browse the results with gui use:
-   imc -load merged_results"
-  fi
-} #>>>
 #------------------------------------------------------------------------------
 # run the main
 main
