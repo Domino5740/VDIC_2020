@@ -27,15 +27,11 @@ class rectangle extends shape;
 	
 endclass: rectangle
 
-class square extends shape;
+class square extends rectangle;
 	
 	function new(real w);
 		super.new(w, w);
 	endfunction : new
-	
-	function real get_area();
-		return width * width;
-	endfunction : get_area
 	
 	function void print();
 		$display("Square w=%g area=%g", width, get_area());
@@ -70,14 +66,17 @@ class shape_factory;
 		case(shape_type)
 			"rectangle" : begin
 				rectangle_h = new(w, h);
+				shape_reporter#(rectangle)::store_shape(rectangle_h);
 				return rectangle_h;
 			end
 			"square" : begin
 				square_h = new(w);
+				shape_reporter#(square)::store_shape(square_h);
 				return square_h;
 			end
 			"triangle" : begin
 				triangle_h = new(w, h);
+				shape_reporter#(triangle)::store_shape(triangle_h);
 				return triangle_h;
 			end
 			default : $fatal(1, "No such shape: ", shape_type);
@@ -110,31 +109,21 @@ module top;
 	initial begin
 		
 		shape shape_h;
-		rectangle rectangle_h;
-		square square_h;
-		triangle triangle_h;
 		string shape;
 		real width, height;
 		int shapes_list;
 		
 		shapes_list = $fopen("./shapes.txt", "r");
 		if (shapes_list) begin
+			while($fscanf(shapes_list, "%s %g %g", shape, width, height) == 3) begin
+				shape_h = shape_factory::make_shape(shape, width, height);
+			end
 		end
 		else $fatal(1, "File was NOT opened succesfully: ", shapes_list);
 		
-		while($fscanf(shapes_list, "%s %g %g", shape, width, height) == 3) begin
-			shape_h = shape_factory::make_shape(shape, width, height);
-			if($cast(rectangle_h, shape_h))
-				shape_reporter#(rectangle)::store_shape(rectangle_h);
-			else if($cast(square_h, shape_h))
-				shape_reporter#(square)::store_shape(square_h);
-			else if($cast(triangle_h, shape_h))
-				shape_reporter#(triangle)::store_shape(triangle_h);
-			else $fatal(1, "Wrong shape in file: ", shape);
-		end
 		shape_reporter#(rectangle)::report_shapes();
 		shape_reporter#(square)::report_shapes();
 		shape_reporter#(triangle)::report_shapes();
-		$finish("Simulation comppleted succesfully");
+		$finish("Simulation completed succesfully");
 	end
 endmodule : top
