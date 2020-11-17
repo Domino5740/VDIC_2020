@@ -1,11 +1,13 @@
-class coverage;
+class coverage extends uvm_component;
+	
+	`uvm_component_utils(coverage)
 	
 	virtual alu_bfm bfm;
 	bit [31:0] A_data, B_data;
 	tester_op_t tester_op_set;
 	
 	covergroup op_cov;
-		option.name = "cg_op_cov";
+		option.name = "op_cov";
 		coverpoint tester_op_set {
 			bins A1_all_op[] = {[no_op_test:sub_op_test], bad_data_op_test, bad_crc_op_test};
 			bins A2_rst_to_op[] = (rst_op_test => [no_op_test : sub_op_test], bad_data_op_test, bad_crc_op_test);
@@ -56,20 +58,26 @@ class coverage;
 		}
 	endgroup
 	
-	function new(virtual alu_bfm b);
+	function new(string name, uvm_component parent);
+		super.new(name, parent);
 		op_cov = new();
 		zeros_or_ones_on_ops = new();
-		bfm = b;
 	endfunction : new
 	
-	task execute();
-		forever begin @(negedge bfm.clk);
+	function void build_phase(uvm_phase phase);
+		if(!uvm_config_db #(virtual alu_bfm)::get(null, "*", "bfm", bfm))
+			$fatal(1, "Failed to get BFM");
+	endfunction : build_phase
+	
+	task run_phase(uvm_phase phase);
+		forever begin : sampling_block 
+			@(negedge bfm.clk);
 			A_data = bfm.A_data;
 			B_data = bfm.B_data;
 			tester_op_set = bfm.tester_op_set;
 			op_cov.sample();
 			zeros_or_ones_on_ops.sample();
-		end
-	endtask : execute
+		end : sampling_block
+	endtask : run_phase
 
 endclass : coverage

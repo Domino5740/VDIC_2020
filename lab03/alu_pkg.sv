@@ -1,5 +1,8 @@
 package alu_pkg;
 
+import uvm_pkg::*;
+	`include "uvm_macros.svh"
+
 typedef enum bit[2:0] {
 	no_op_test		 = 3'b000,
 	and_op_test		 = 3'b001,
@@ -26,8 +29,12 @@ typedef enum bit [1:0] {
 } byte_type_t;
 	
 `include "coverage.svh"
-`include "tester.svh"
+`include "base_tester.svh"
+`include "random_tester.svh"
+`include "zeros_ones_tester.svh"
 `include "scoreboard.svh"
-`include "testbench.svh"
+`include "env.svh"
+`include "random_test.svh"
+`include "zeros_ones_test.svh"
 
 endpackage : alu_pkg

@@ -1,4 +1,5 @@
-# tested with XCELIUM 18.09
+#!/bin/bash
+# tested with XCELIUM 19.09
 
 # Commmand arguments:
 # -g option starts xrun simulation with gui, with separate database
@@ -11,7 +12,8 @@
 
 #------------------------------------------------------------------------------
 # The list of tests; in GUI mode only the first test is started.
-TESTS=(lab02);
+# TESTS=(random_test);
+TESTS=(random_test zeros_ones_test);
 #------------------------------------------------------------------------------
 # MAIN
 function main(){
@@ -19,11 +21,14 @@ function main(){
   xrun_elaborate
   xrun_run_all_tests
   run_imc
+  time_meas_report
 }
 #------------------------------------------------------------------------------
 # local variables#<<<
 INCA="INCA_libs"
 GUI=""
+start_time=0
+time_report=""
 #>>>
 #------------------------------------------------------------------------------
 # check input script arguments#<<<
@@ -50,6 +55,8 @@ XRUN_ARGS="\
   +nowarnDSEM2009 \
   +nowarnDSEMEL \
   +nowarnCGDEFN \
+  +nowarnXCLGNOPTM \
+  +nowarnRNDXCELON \
   -xmlibdirname $INCA \
   $GUI \
   +overwrite \
@@ -57,6 +64,9 @@ XRUN_ARGS="\
   -coverage all \
   -covoverwrite \
   -covfile xrun_covfile.txt \
+  -uvm \
+  +UVM_NO_RELNOTES \
+  +UVM_VERBOSITY=MEDIUM
 "
 #>>>
 #------------------------------------------------------------------------------
@@ -66,7 +76,8 @@ function xrun_info() { #<<<
   # Prints string between separators
   # args: string
   echo $separator
-  echo "$*"
+  echo -n `date +[%k:%M:%S]`
+  echo " # $*"
   echo $separator
   return 0
 } #>>>
@@ -87,35 +98,47 @@ function xrun_check_status() { #<<<
 } #>>>
 #------------------------------------------------------------------------------
 function xrun_compile() { #<<<
-  xrun_info "# Compiling. Log saved to xrun_compile.log"
+  time_meas_start
+  xrun_info "Compiling. Log saved to xrun_compile.log"
   xrun -compile -l xrun_compile.log $XRUN_ARGS 
   xrun_check_status $? "Compilation"
+  time_meas_end "Compilation"
 } #>>>
 #------------------------------------------------------------------------------
 function xrun_elaborate() { #<<<
-  xrun_info "# Elaborating. Log saved to xrun_elaborate.log"
+  time_meas_start
+  xrun_info "Elaborating. Log saved to xrun_elaborate.log"
   xrun -elaborate  -l xrun_elaborate.log $XRUN_ARGS
   xrun_check_status $? "Elaboration"
+  time_meas_end "Elaboration"
 } #>>>
 #------------------------------------------------------------------------------
 function xrun_run_all_tests() { #<<<
+
+  rm -rf cov_work # clean old coverage data
+
   if [[ "$GUI" != "" ]] ; then
       xrun $XRUN_ARGS \
         -covtest ${TESTS[0]} \
-        -l xrun_gui.log
-#        +UVM_TESTNAME=${TESTS[0]} \
+        -l xrun_gui.log \
+        +UVM_TESTNAME=${TESTS[0]} 
   else  
     TEST_LIST=""
 
     for TEST in ${TESTS[@]} ; do
       TEST_LIST="$TEST_LIST $TEST"
-      xrun_info "# Running test: $TEST. Log saved to xrun_test_$TEST.log"
+      xrun_info "Running test: $TEST. Log saved to xrun_test_$TEST.log"
+      
       # run the simulation
+      time_meas_start
       xrun $XRUN_ARGS \
         -covtest $TEST \
-        -l xrun_test_$TEST.log
-#        +UVM_TESTNAME=$TEST \
+        -l xrun_test_$TEST.log \
+        +UVM_TESTNAME=$TEST
+
       xrun_check_status $? "Test $TEST"
+      time_meas_end "Simulation test $TEST"
+
     done
 
     echo "# End of tests."
@@ -123,7 +146,8 @@ function xrun_run_all_tests() { #<<<
 } #>>>
 #------------------------------------------------------------------------------
 function run_imc { #<<<
-  xrun_info "# Running imc."
+  xrun_info "Running imc."
+  time_meas_start
   #------------------------------------------------------------------------------
   # print the coverage results summary (non-GUI mode)
   if [[ "$GUI" == "" ]] ; then
@@ -143,8 +167,26 @@ function run_imc { #<<<
  To browse the results with gui use:
    imc -load merged_results"
   fi
+  time_meas_end "IMC"
+} #>>>
+#------------------------------------------------------------------------------
+function time_meas_start { #<<<
+  start_time=$(date +%s)
+} #>>>
+function time_meas_end { #<<<
+  end_time=$(date +%s)
+  info=$*;
+  time_report+=$'\n'
+  time_report+="  $info : $((end_time - start_time))s"
+} #>>>
+function time_meas_report { #<<<
+  echo $separator
+  echo -n "Time measurement results:"
+  echo "$time_report"
+  echo $separator
 } #>>>
 #------------------------------------------------------------------------------
 # run the main
 main
+
 # vim: fdm=marker foldmarker=<<<\,>>>
