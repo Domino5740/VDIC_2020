@@ -2,7 +2,8 @@
 *.svwf
 *.history
 *.rpt
-INCA_libs/
-INCA_libs_gui/
-cov_work/
+*.key
+*/INCA_libs/
+*/INCA_libs_gui/
+*/cov_work/
 *~
