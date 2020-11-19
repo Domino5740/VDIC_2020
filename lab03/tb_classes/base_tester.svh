@@ -16,6 +16,7 @@ virtual class base_tester extends uvm_component;
 	pure virtual function bit [31:0] get_data();
 	
 	task run_phase(uvm_phase phase);
+		
 		bit [31:0] A_data, B_data;
 		tester_op_t tester_op_set;
 		

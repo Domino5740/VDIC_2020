@@ -23,7 +23,16 @@ class random_tester extends base_tester;
 	endfunction
 	
 	virtual function bit[31:0] get_data();
-			return $random();
+		
+	bit [1:0] zero_ones;
+		
+	zero_ones = $random;
+	if(zero_ones == 2'b00)
+		return 32'h00000000;
+	else if(zero_ones == 2'b11)
+		return 32'hFFFFFFFF;
+	else
+		return $random();
 	endfunction
-
+	
 endclass : random_tester

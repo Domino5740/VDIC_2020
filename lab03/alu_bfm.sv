@@ -262,7 +262,7 @@ task read_byte_sout(
 	crc = 0;
 	err_flags = 0;
 	parity_bit = 0;
-		//     || rst_n != 1
+		
 	while(sout != 0) @(negedge clk);
 	
 	@(negedge clk)

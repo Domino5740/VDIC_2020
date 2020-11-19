@@ -16,6 +16,4 @@ class zeros_ones_tester extends random_tester;
 			return 32'hFFFFFFFF;
 	endfunction
 
-
-
 endclass : zeros_ones_tester
