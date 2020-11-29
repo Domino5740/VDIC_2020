@@ -1,19 +1,18 @@
-class scoreboard extends uvm_component;
-	
+class scoreboard extends uvm_subscriber #(result_s);
 	`uvm_component_utils(scoreboard)
 	
-	virtual alu_bfm bfm;
+	uvm_tlm_analysis_fifo #(command_s) cmd_f;
 	
 	function new(string name, uvm_component parent);
 		super.new(name, parent);
 	endfunction : new
 	
 	function void build_phase(uvm_phase phase);
-		if(!uvm_config_db #(virtual alu_bfm)::get(null, "*", "bfm", bfm))
-			$fatal(1, "Failed to get BFM");
+		cmd_f = new("cmd_f", this);
 	endfunction : build_phase
 	
-	task run_phase(uvm_phase phase);
+	function void write(result_s t);
+		
 		bit signed [31:0] A_data, B_data;
 		opcode_t opcode;
 		
@@ -36,16 +35,24 @@ class scoreboard extends uvm_component;
 		bit carry;
 		bit fail;
 		
-		forever begin
+		command_s cmd;
+		if(!cmd_f.try_get(cmd)) //tak nie moze byc chybabo bedzie fatal zawsze
+			$fatal(1, "Missing command in self checker");
+		else begin
 			
 			carry = 0;
 			expected_alu_flags = 0;
 			expected_parity_bit = 0;
 			
-			bfm.read_serial_sin(A_data, B_data, sent_4b_CRC, opcode, data_error);
+			A_data = cmd.A_data;
+			B_data = cmd.B_data;
+			sent_4b_CRC  = cmd.sent_4b_CRC;
+			opcode = cmd.op_set;
+			data_error = cmd.data_error;
+			
 			if(data_error) expected_err_flags = 6'b100100;
 			else begin
-				calculated_4b_CRC = bfm.calc_crc_4b({B_data, A_data, 1'b1, opcode});
+				calculated_4b_CRC = bfm.calc_crc_4b({B_data, A_data, 1'b1, opcode}); //HOW SHOULD WE DO THIS?? MOVE THIS PART TO RESULT_MONITOR? move the function definition to alu_pkg???
 				if(sent_4b_CRC != calculated_4b_CRC) expected_err_flags = 6'b010010;
 				else expected_err_flags = 6'b000000;
 				case(opcode)
@@ -75,7 +82,7 @@ class scoreboard extends uvm_component;
 					expected_alu_flags[3] = carry;
 					expected_alu_flags[1] = (expected_C_data == 0); 
 					expected_alu_flags[0] = (expected_C_data <  0);
-					expected_3b_CRC = bfm.calc_crc_3b({expected_C_data, 1'b0, expected_alu_flags});
+					expected_3b_CRC = bfm.calc_crc_3b({expected_C_data, 1'b0, expected_alu_flags}); //same as above
 				end
 			end
 			
@@ -86,12 +93,17 @@ class scoreboard extends uvm_component;
 				expected_3b_CRC = 0;
 			end
 			
-			bfm.read_serial_sout(received_C_data, received_alu_flags, received_3b_CRC, received_err_flags, received_parity_bit);
+			received_C_data = t.C_data;
+			received_alu_flags = t.alu_flags;
+			received_3b_CRC = t.rec_3b_CRC;
+			received_err_flags = t.err_flags;
+			received_parity_bit = t.parity_bit;
+			
 			if(expected_err_flags != 0 && (received_err_flags != expected_err_flags || received_parity_bit != expected_parity_bit)) fail = 1;
 			else if((received_alu_flags != expected_alu_flags) || received_C_data != expected_C_data || received_3b_CRC != expected_3b_CRC) fail = 1;
 			
 			if(fail) $error("FAILED: A: %0h B : %0h op: %s C: %0h", A_data, B_data, opcode.name(), received_C_data);
 		end
-	endtask : run_phase
+	endfunction : write
 
 endclass : scoreboard

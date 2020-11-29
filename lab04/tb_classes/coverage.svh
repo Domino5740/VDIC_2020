@@ -1,10 +1,10 @@
-class coverage extends uvm_component;
+class coverage extends uvm_subscriber #(command_s);
 	
 	`uvm_component_utils(coverage)
 	
-	virtual alu_bfm bfm;
-	bit [31:0] A_data, B_data;
-	tester_op_t tester_op_set;
+	
+	protected bit [31:0] A_data, B_data;
+	protected tester_op_t tester_op_set;
 	
 	covergroup op_cov;
 		option.name = "op_cov";
@@ -64,20 +64,12 @@ class coverage extends uvm_component;
 		zeros_or_ones_on_ops = new();
 	endfunction : new
 	
-	function void build_phase(uvm_phase phase);
-		if(!uvm_config_db #(virtual alu_bfm)::get(null, "*", "bfm", bfm))
-			$fatal(1, "Failed to get BFM");
-	endfunction : build_phase
-	
-	task run_phase(uvm_phase phase);
-		forever begin : sampling_block 
-			@(negedge bfm.clk);
-			A_data = bfm.A_data;
-			B_data = bfm.B_data;
-			tester_op_set = bfm.tester_op_set;
-			op_cov.sample();
-			zeros_or_ones_on_ops.sample();
-		end : sampling_block
-	endtask : run_phase
+	function void write(command_s t);
+		A_data = t.A_data;
+		B_data = t.B_data;
+		tester_op_set = t.tester_op_set;
+		op_cov.sample();
+		zeros_or_ones_on_ops.sample();
+	endfunction : write
 
 endclass : coverage

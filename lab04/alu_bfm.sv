@@ -11,10 +11,10 @@ bit [31:0] A_data, B_data;
 tester_op_t tester_op_set;
 opcode_t opcode_set;
 
-initial begin
+initial begin : clock_gen
 	clk = 0;
 	forever #10 clk = ~clk;
-end
+end : clock_gen
 
 function opcode_t get_opcode();
 	
@@ -96,9 +96,7 @@ task test_op(input bit [31:0] A, B,
 
 	case(tester_op_set)
 		rst_op_test: begin
-			rst_n = 0;
-			for(int i = 0; i <= 99; i++) @(negedge clk);
-			rst_n = 1;
+			reset_alu();
 		end
 		bad_data_op_test: begin
 			opcode_set = get_opcode();
@@ -137,7 +135,7 @@ task test_op(input bit [31:0] A, B,
 		crc_4b = (tester_op_set == bad_crc_op_test) ? crc_4b + 1 : crc_4b;
 		send_ctl_byte({1'b0, opcode_set, crc_4b});
 	end
-
+	#1500;
 endtask
 
 task read_byte_sin(
@@ -326,5 +324,33 @@ task read_serial_sout(
 		
 	read_byte_sout(byte_type, d, alu_flags, crc, err_flags, parity_bit);
 endtask
+
+command_monitor command_monitor_h;
+command_s command;
+initial begin : command_monitor_thread
+	while(!tester_op_set) @(posedge clk);
+	command.tester_op_set = tester_op_set;
+	forever begin
+		
+		command.A_data = A_data;
+		command.B_data = B_data;
+		command.tester_op_set = tester_op_set;
+		read_serial_sin(command.A_data, command.B_data, command.sent_4b_CRC, command.op_set, command.data_error);
+		command_monitor_h.write_to_monitor(command);
+		
+	end
+end : command_monitor_thread
+
+result_monitor result_monitor_h;
+result_s result;
+
+initial begin : result_monitor_thread
+	forever begin
+	
+		read_serial_sout(result.C_data, result.alu_flags, result.rec_3b_CRC, result.err_flags, result.parity_bit);
+		result_monitor_h.write_to_monitor(result);
+	
+	end
+end : result_monitor_thread
 
 endinterface
