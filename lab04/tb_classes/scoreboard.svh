@@ -36,9 +36,8 @@ class scoreboard extends uvm_subscriber #(result_s);
 		bit fail;
 		
 		command_s cmd;
-		if(!cmd_f.try_get(cmd)) //tak nie moze byc chybabo bedzie fatal zawsze
-			$fatal(1, "Missing command in self checker");
-		else begin
+
+		if(cmd_f.try_get(cmd)) begin
 			
 			carry = 0;
 			expected_alu_flags = 0;
@@ -52,7 +51,7 @@ class scoreboard extends uvm_subscriber #(result_s);
 			
 			if(data_error) expected_err_flags = 6'b100100;
 			else begin
-				calculated_4b_CRC = bfm.calc_crc_4b({B_data, A_data, 1'b1, opcode}); //HOW SHOULD WE DO THIS?? MOVE THIS PART TO RESULT_MONITOR? move the function definition to alu_pkg???
+				calculated_4b_CRC = calc_crc_4b({B_data, A_data, 1'b1, opcode});
 				if(sent_4b_CRC != calculated_4b_CRC) expected_err_flags = 6'b010010;
 				else expected_err_flags = 6'b000000;
 				case(opcode)
@@ -82,7 +81,7 @@ class scoreboard extends uvm_subscriber #(result_s);
 					expected_alu_flags[3] = carry;
 					expected_alu_flags[1] = (expected_C_data == 0); 
 					expected_alu_flags[0] = (expected_C_data <  0);
-					expected_3b_CRC = bfm.calc_crc_3b({expected_C_data, 1'b0, expected_alu_flags}); //same as above
+					expected_3b_CRC = calc_crc_3b({expected_C_data, 1'b0, expected_alu_flags}); //same as above
 				end
 			end
 			

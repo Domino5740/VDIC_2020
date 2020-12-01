@@ -65,8 +65,8 @@ class coverage extends uvm_subscriber #(command_s);
 	endfunction : new
 	
 	function void write(command_s t);
-		A_data = t.A_data;
-		B_data = t.B_data;
+		A_data = $unsigned(t.A_data);
+		B_data = $unsigned(t.B_data);
 		tester_op_set = t.tester_op_set;
 		op_cov.sample();
 		zeros_or_ones_on_ops.sample();

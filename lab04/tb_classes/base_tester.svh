@@ -26,7 +26,6 @@ virtual class base_tester extends uvm_component;
 			command.A_data = get_data();
 			command.B_data = get_data();
 			command_port.put(command);
-			
 		end : tester_loop
 		
 		phase.drop_objection(this);
