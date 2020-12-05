@@ -307,22 +307,24 @@ task read_serial_sout(
 endtask
 
 command_monitor command_monitor_h;
-command_s command;
+random_command command;
 
 initial begin : command_monitor_thread
+	command = new("command");
 	forever begin
 		
 		wait(new_data);
-		command.tester_op_set = tester_op_set;
-		read_serial_sin(command.A_data, command.B_data, command.sent_4b_CRC, command.op_set, command.data_error);
+		command.tester_op = tester_op_set;
+		read_serial_sin(command.A_data, command.B_data, command.sent_4b_CRC, command.opcode, command.data_error);
 		command_monitor_h.write_to_monitor(command);
 	end
 end : command_monitor_thread
 
 result_monitor result_monitor_h;
-result_s result;
+result_transaction result;
 
 initial begin : result_monitor_thread
+	result = new("result");
 	forever begin
 	
 		read_serial_sout(result.C_data, result.alu_flags, result.rec_3b_CRC, result.err_flags, result.parity_bit);

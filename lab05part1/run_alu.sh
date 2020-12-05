@@ -13,7 +13,7 @@
 #------------------------------------------------------------------------------
 # The list of tests; in GUI mode only the first test is started.
 # TESTS=(random_test);
-TESTS=(random_test zeros_ones_test);
+TESTS=(random_test minmax_test);
 #------------------------------------------------------------------------------
 # MAIN
 function main(){

@@ -1,7 +1,7 @@
-virtual class base_tester extends uvm_component;
-	`uvm_component_utils(base_tester)
+class tester extends uvm_component;
+	`uvm_component_utils(tester)
 	
-	uvm_put_port #(command_s) command_port;
+	uvm_put_port #(random_command) command_port;
 	
 	function new(string name, uvm_component parent);
 		super.new(name, parent);
@@ -10,21 +10,23 @@ virtual class base_tester extends uvm_component;
 	function void build_phase(uvm_phase phase);
 		command_port = new("command_port", this);
 	endfunction : build_phase
-	
-	pure virtual function tester_op_t get_op();
-	pure virtual function bit [31:0] get_data();
+
 	
 	task run_phase(uvm_phase phase);
 
-		command_s command;
+		random_command command;
 		
 		phase.raise_objection(this);
 		
+		command = new("command");
+		command.tester_op = rst_op_test;
+		command_port.put(command);
+		
 		repeat(1000) begin : tester_loop
 			
-			command.tester_op_set = get_op();
-			command.A_data = get_data();
-			command.B_data = get_data();
+			command = random_command::type_id::create("command");
+			if(!command.randomize())
+				`uvm_fatal("TESTER", "Randomization failed");
 			command_port.put(command);
 		end : tester_loop
 		
@@ -32,4 +34,4 @@ virtual class base_tester extends uvm_component;
 		
 	endtask : run_phase
 	
-endclass : base_tester
+endclass : tester

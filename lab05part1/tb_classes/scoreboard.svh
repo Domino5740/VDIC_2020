@@ -1,7 +1,7 @@
-class scoreboard extends uvm_subscriber #(result_s);
+class scoreboard extends uvm_subscriber #(result_transaction);
 	`uvm_component_utils(scoreboard)
 	
-	uvm_tlm_analysis_fifo #(command_s) cmd_f;
+	uvm_tlm_analysis_fifo #(random_command) cmd_f;
 	
 	function new(string name, uvm_component parent);
 		super.new(name, parent);
@@ -11,7 +11,7 @@ class scoreboard extends uvm_subscriber #(result_s);
 		cmd_f = new("cmd_f", this);
 	endfunction : build_phase
 	
-	function void write(result_s t);
+	function void write(result_transaction t);
 		
 		bit signed [31:0] A_data, B_data;
 		opcode_t opcode;
@@ -35,7 +35,7 @@ class scoreboard extends uvm_subscriber #(result_s);
 		bit carry;
 		bit fail;
 		
-		command_s cmd;
+		random_command cmd;
 
 		if(cmd_f.try_get(cmd)) begin
 			
@@ -46,7 +46,7 @@ class scoreboard extends uvm_subscriber #(result_s);
 			A_data = cmd.A_data;
 			B_data = cmd.B_data;
 			sent_4b_CRC  = cmd.sent_4b_CRC;
-			opcode = cmd.op_set;
+			opcode = cmd.opcode;
 			data_error = cmd.data_error;
 			
 			if(data_error) expected_err_flags = 6'b100100;

@@ -1,7 +1,7 @@
-class result_monitor extends uvm_component;
-	`uvm_component_utils(result_monitor)
+class command_monitor extends uvm_component;
+	`uvm_component_utils(command_monitor)
 	
-	uvm_analysis_port #(result_s) ap;
+	uvm_analysis_port #(random_command) ap;
 	
 	function new(string name, uvm_component parent);
 		super.new(name, parent);
@@ -14,13 +14,12 @@ class result_monitor extends uvm_component;
 		if(!uvm_config_db #(virtual alu_bfm)::get(null, "*", "bfm", bfm))
 			$fatal(1, "Failed to get BFM");
 		
-		bfm.result_monitor_h = this;
-		
+		bfm.command_monitor_h = this;
 		ap = new("ap", this);
 	endfunction : build_phase
 	
-	function void write_to_monitor(result_s result);
-		ap.write(result);
+	function void write_to_monitor(random_command cmd);
+		ap.write(cmd);
 	endfunction : write_to_monitor
 	
-endclass : result_monitor
+endclass : command_monitor

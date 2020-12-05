@@ -28,23 +28,6 @@ typedef enum bit [1:0] {
 	ERR = 2'b11
 } byte_type_t;
 	
-typedef struct packed {
-	bit signed [31:0] A_data;
-	bit signed [31:0] B_data;
-	bit [3:0]  sent_4b_CRC;
-	tester_op_t tester_op_set;
-	opcode_t op_set;
-	bit data_error;
-} command_s;
-	
-typedef struct packed {
-	bit signed [31:0] C_data;
-	bit [3:0] alu_flags;
-	bit [2:0] rec_3b_CRC;
-	bit [5:0] err_flags;
-	bit parity_bit;
-} result_s;
-	
 function bit [2:0] calc_crc_3b(input bit [36:0] data_in);
 
   	static bit [2:0] lfsr_q = 3'b000;
@@ -71,11 +54,12 @@ function bit [3:0] calc_crc_4b(input bit [67:0] data_in);
 	return crc_out;
 	
 endfunction
-	
+
+`include "random_command.svh"
+`include "minmax_command.svh"
+`include "result_transaction.svh"
 `include "coverage.svh"
-`include "base_tester.svh"
-`include "random_tester.svh"
-`include "zeros_ones_tester.svh"
+`include "tester.svh"
 `include "scoreboard.svh"
 `include "driver.svh"
 `include "command_monitor.svh"
@@ -84,6 +68,6 @@ endfunction
 `include "env.svh"
 
 `include "random_test.svh"
-`include "zeros_ones_test.svh"
+`include "minmax_test.svh"
 
 endpackage : alu_pkg
