@@ -22,7 +22,7 @@ class tester extends uvm_component;
 		command.tester_op = rst_op_test;
 		command_port.put(command);
 		
-		repeat(1000) begin : tester_loop
+		repeat(10000) begin : tester_loop
 			
 			command = random_command::type_id::create("command");
 			if(!command.randomize())

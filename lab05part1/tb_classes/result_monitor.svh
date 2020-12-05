@@ -15,7 +15,6 @@ class result_monitor extends uvm_component;
 			$fatal(1, "Failed to get BFM");
 		
 		bfm.result_monitor_h = this;
-		
 		ap = new("ap", this);
 	endfunction : build_phase
 	
