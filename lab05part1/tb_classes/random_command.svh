@@ -5,6 +5,7 @@ class random_command extends uvm_transaction;
 	rand bit signed [31:0] B_data;
 	rand tester_op_t tester_op;
 	opcode_t opcode;
+	//TODO: remove opcode generation from the bfm, maybe create enum vali_data
 	bit [3:0]  sent_4b_CRC;
 	bit data_error;
    

@@ -1,0 +1,33 @@
+//
+// File created by:  xrun
+// Do not modify this file
+//
+-XLMODE
+./xcelium.d/run.lnx86.19.09.d
+-RUNMODE
+-UVMNOSINGLESTEP
+-define
+UVM_PLI
+-sv
+./lab05part1/mtm_Alu.vp
+./lab05part1/alu_pkg.sv
+./lab05part1/alu_bfm.sv
+./lab05part1/alu_tb.sv
+-INCDIR
+./lab05part1/tb_classes
+-CDSLIB
+./xcelium.d/run.lnx86.19.09.d/cdsrun.lib
+-HDLVAR
+./xcelium.d/run.lnx86.19.09.d/hdlrun.var
+-I_INCDIR
+/cad/XCELIUM1909/tools/methodology/UVM/CDNS-1.1d/sv/src
+-DEFINE
+USE_PARAMETERIZED_WRAPPER
+-I_INCDIR
+/cad/XCELIUM1909/tools/methodology/UVM/CDNS-1.1d/additions/sv
+-MESSAGES
+-UPDATE
+-XLLIBSTORE
+./xcelium.d/run.lnx86.19.09.d/xllibs
+-ALLOWUNBOUND
+-ENABLEOIGW
