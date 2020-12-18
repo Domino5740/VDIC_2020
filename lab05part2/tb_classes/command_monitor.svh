@@ -9,13 +9,14 @@ class command_monitor extends uvm_component;
 	
 	function void build_phase(uvm_phase phase);
 		
-		virtual alu_bfm bfm;
+		alu_agent_config alu_agent_config_h;
 		
-		if(!uvm_config_db #(virtual alu_bfm)::get(null, "*", "bfm", bfm))
-			$fatal(1, "Failed to get BFM");
+		if(!uvm_config_db #(alu_agent_config)::get(this, "", "config", alu_agent_config_h))
+			$fatal(1, "Failed to get config");
 		
-		bfm.command_monitor_h = this;
+		alu_agent_config_h.bfm.command_monitor_h = this;
 		ap = new("ap", this);
+		
 	endfunction : build_phase
 	
 	function void write_to_monitor(random_command cmd);

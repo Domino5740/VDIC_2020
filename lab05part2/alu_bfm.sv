@@ -18,19 +18,6 @@ initial begin : clock_gen
 	forever #10 clk = ~clk;
 end : clock_gen
 
-function opcode_t get_opcode();
-	
-	bit[1:0] opcode_choice;
-	
-	opcode_choice = $random;
-	case(opcode_choice)
-		2'b00	:	return and_opcode;
-		2'b01	:	return add_opcode;
-		2'b10	:	return or_opcode;
-		2'b11	:	return sub_opcode;
-	endcase
-endfunction
-
 task reset_alu();
 	rst_n = 1'b0;
 	@(negedge clk); @(negedge clk);
@@ -61,11 +48,13 @@ task send_data(input bit [31:0] data);
 endtask
 
 task test_op(input bit [31:0] A, B,
-			 input tester_op_t op);
+			 input tester_op_t op,
+			 input opcode_t opcode);
 
 	bit [3:0] crc_4b;
 
 	tester_op_set = op;
+	opcode_set = opcode;
 	A_data = A;
 	B_data = B;
 	new_data = 1;
@@ -73,12 +62,6 @@ task test_op(input bit [31:0] A, B,
 	case(tester_op_set)
 		rst_op_test: begin
 			reset_alu();
-		end
-		bad_data_op_test: begin
-			opcode_set = get_opcode();
-		end
-		bad_crc_op_test: begin
-			opcode_set = get_opcode();
 		end
 		no_op_test : begin
 			opcode_set = no_opcode;
@@ -95,6 +78,7 @@ task test_op(input bit [31:0] A, B,
 		sub_op_test: begin	
 			opcode_set = sub_opcode;
 		end
+		default: begin end
 	endcase
 	
 	if(tester_op_set != rst_op_test) begin

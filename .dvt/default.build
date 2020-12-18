@@ -2,5 +2,5 @@
 # DO NOT explicitly list files/directories in 'dvt_auto_init' sections. Use 'dvt_init' sections instead.
 #+dvt_init_auto
 -uvm
--F ./lab05part1/dut.f
--F ./lab05part1/tb.f
+-F ./lab05part2/dut.f
+-F ./lab05part2/tb.f

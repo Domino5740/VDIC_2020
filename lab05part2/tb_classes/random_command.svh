@@ -4,10 +4,11 @@ class random_command extends uvm_transaction;
 	rand bit signed [31:0] A_data;
 	rand bit signed [31:0] B_data;
 	rand tester_op_t tester_op;
-	opcode_t opcode;
-	//TODO: remove opcode generation from the bfm, maybe create enum vali_data
+	rand opcode_t opcode;
 	bit [3:0]  sent_4b_CRC;
 	bit data_error;
+
+   constraint rand_opcode { opcode dist {and_opcode := 1, add_opcode := 1, or_opcode := 1, sub_opcode:= 1};}
    
    	function new (string name = "");
     	super.new(name);
