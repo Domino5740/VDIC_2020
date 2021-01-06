@@ -12,7 +12,7 @@ class random_sequence extends uvm_sequence #(sequence_item);
 		`uvm_create(seq_item)
 		`uvm_info("RANDOM_SEQ", "START", UVM_MEDIUM)
 		
-		repeat(1000000) begin : tester_loop
+		repeat(10000) begin : tester_loop
 			
 			`uvm_rand_send(seq_item);
 			

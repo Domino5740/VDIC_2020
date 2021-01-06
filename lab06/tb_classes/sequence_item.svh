@@ -7,6 +7,7 @@ class sequence_item extends uvm_sequence_item;
 	bit [3:0]  sent_4b_CRC;
 	bit data_error;
    
+   constraint rand_op {tester_op dist {[no_op_test : bad_crc_op_test] :/ 1};}
    constraint rand_opcode {opcode dist {and_opcode := 1, add_opcode := 1, or_opcode := 1, sub_opcode := 1};}
    
    	function new (string name = "");
