@@ -1,8 +1,7 @@
-class driver extends uvm_component;
+class driver extends uvm_driver #(sequence_item);
 	`uvm_component_utils(driver)
 	
 	virtual alu_bfm bfm;
-	uvm_get_port #(random_command) command_port;
 	
 	function new(string name, uvm_component parent);
 		super.new(name, parent);
@@ -10,17 +9,18 @@ class driver extends uvm_component;
 	
 	function void build_phase(uvm_phase phase);
 		if(!uvm_config_db #(virtual alu_bfm)::get(null, "*", "bfm", bfm))
-			$fatal(1, "Failed to get BFM");
-		command_port = new("command_port", this);
+			`uvm_fatal("DRIVER", "Failed to get BFM");
 	endfunction : build_phase
 	
 	task run_phase(uvm_phase phase);
-		random_command command;
 		
-		forever begin : command_loop
-			command_port.get(command);
-			bfm.test_op(command.A_data, command.B_data, command.tester_op);
-		end : command_loop
+		sequence_item seq_item;
+		
+		forever begin : seq_loop
+			seq_item_port.get_next_item(seq_item);
+			bfm.test_op(seq_item.A_data, seq_item.B_data, seq_item.tester_op, seq_item.opcode);
+			seq_item_port.item_done();
+		end : seq_loop
 	endtask : run_phase
 	
 endclass : driver

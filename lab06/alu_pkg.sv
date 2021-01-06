@@ -55,11 +55,15 @@ function bit [3:0] calc_crc_4b(input bit [67:0] data_in);
 	
 endfunction
 
-`include "random_command.svh"
-`include "minmax_command.svh"
+`include "sequence_item.svh"
+
+`include "random_sequence.svh"
+`include "minmax_sequence.svh"
+
 `include "result_transaction.svh"
+
 `include "coverage.svh"
-`include "tester.svh"
+`include "sequencer.svh"
 `include "scoreboard.svh"
 `include "driver.svh"
 `include "command_monitor.svh"
@@ -67,6 +71,7 @@ endfunction
 
 `include "env.svh"
 
+`include "alu_base_test.svh"
 `include "random_test.svh"
 `include "minmax_test.svh"
 
