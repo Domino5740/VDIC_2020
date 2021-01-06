@@ -18,6 +18,19 @@ initial begin : clock_gen
 	forever #10 clk = ~clk;
 end : clock_gen
 
+function opcode_t get_opcode();
+	
+	bit[1:0] opcode_choice;
+	
+	opcode_choice = $random;
+	case(opcode_choice)
+		2'b00	:	return and_opcode;
+		2'b01	:	return add_opcode;
+		2'b10	:	return or_opcode;
+		2'b11	:	return sub_opcode;
+	endcase
+endfunction
+
 task reset_alu();
 	rst_n = 1'b0;
 	@(negedge clk); @(negedge clk);
@@ -48,12 +61,11 @@ task send_data(input bit [31:0] data);
 endtask
 
 task test_op(input bit [31:0] A, B,
-			 input tester_op_t op, input opcode_t opcode);
+			 input tester_op_t op);
 
 	bit [3:0] crc_4b;
 
 	tester_op_set = op;
-	opcode_set = opcode;
 	A_data = A;
 	B_data = B;
 	new_data = 1;
@@ -61,6 +73,12 @@ task test_op(input bit [31:0] A, B,
 	case(tester_op_set)
 		rst_op_test: begin
 			reset_alu();
+		end
+		bad_data_op_test: begin
+			opcode_set = get_opcode();
+		end
+		bad_crc_op_test: begin
+			opcode_set = get_opcode();
 		end
 		no_op_test : begin
 			opcode_set = no_opcode;
@@ -76,9 +94,6 @@ task test_op(input bit [31:0] A, B,
 		end
 		sub_op_test: begin	
 			opcode_set = sub_opcode;
-		end
-		default: begin
-			opcode_set = opcode;
 		end
 	endcase
 	
@@ -292,16 +307,16 @@ task read_serial_sout(
 endtask
 
 command_monitor command_monitor_h;
-sequence_item seq_item;
+random_command command;
 
 initial begin : command_monitor_thread
-	seq_item = new("seq_item");
+	command = new("command");
 	forever begin
 		
 		wait(new_data);
-		seq_item.tester_op = tester_op_set;
-		read_serial_sin(seq_item.A_data, seq_item.B_data, seq_item.sent_4b_CRC, seq_item.opcode, seq_item.data_error);
-		command_monitor_h.write_to_monitor(seq_item);
+		command.tester_op = tester_op_set;
+		read_serial_sin(command.A_data, command.B_data, command.sent_4b_CRC, command.opcode, command.data_error);
+		command_monitor_h.write_to_monitor(command);
 	end
 end : command_monitor_thread
 

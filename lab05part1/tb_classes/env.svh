@@ -1,7 +1,8 @@
 class env extends uvm_env;
 	`uvm_component_utils(env)
 	
-	sequencer sequencer_h;
+	tester tester_h;
+	uvm_tlm_fifo #(random_command) command_f;
 	driver driver_h;
 	
 	coverage coverage_h;
@@ -14,7 +15,8 @@ class env extends uvm_env;
 	endfunction : new
 	
 	function void build_phase(uvm_phase phase);
-		sequencer_h = sequencer::type_id::create("sequencer_h", this);
+		command_f = new("command_f", this);
+		tester_h = tester::type_id::create("tester_h", this);
 		driver_h = driver::type_id::create("driver_h", this);
 		coverage_h = coverage::type_id::create("coverage_h", this);
 		scoreboard_h = scoreboard::type_id::create("scoreboard_h", this);
@@ -23,9 +25,10 @@ class env extends uvm_env;
 	endfunction : build_phase
 	
 	function void connect_phase(uvm_phase phase);
-		driver_h.seq_item_port.connect(sequencer_h.seq_item_export);
+		driver_h.command_port.connect(command_f.get_export);
+        tester_h.command_port.connect(command_f.put_export);
         result_monitor_h.ap.connect(scoreboard_h.analysis_export);
-        command_monitor_h.ap.connect(scoreboard_h.seq_f.analysis_export);
+        command_monitor_h.ap.connect(scoreboard_h.cmd_f.analysis_export);
         command_monitor_h.ap.connect(coverage_h.analysis_export);
 	endfunction : connect_phase
 endclass : env

@@ -1,4 +1,4 @@
-class coverage extends uvm_subscriber #(sequence_item);
+class coverage extends uvm_subscriber #(random_command);
 	
 	`uvm_component_utils(coverage)
 	
@@ -64,7 +64,7 @@ class coverage extends uvm_subscriber #(sequence_item);
 		zeros_or_ones_on_ops = new();
 	endfunction : new
 	
-	function void write(sequence_item t);
+	function void write(random_command t);
 		A_data = $unsigned(t.A_data);
 		B_data = $unsigned(t.B_data);
 		tester_op_set = t.tester_op;

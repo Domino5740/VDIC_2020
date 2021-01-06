@@ -1,5 +1,5 @@
 `timescale 1ns/1ps
-module top;
+module top_TB;
 	
 	import uvm_pkg::*;
 	`include "uvm_macros.svh"

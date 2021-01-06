@@ -1,14 +1,14 @@
 class scoreboard extends uvm_subscriber #(result_transaction);
 	`uvm_component_utils(scoreboard)
 	
-	uvm_tlm_analysis_fifo #(sequence_item) seq_f;
+	uvm_tlm_analysis_fifo #(random_command) cmd_f;
 	
 	function new(string name, uvm_component parent);
 		super.new(name, parent);
 	endfunction : new
 	
 	function void build_phase(uvm_phase phase);
-		seq_f = new("seq_f", this);
+		cmd_f = new("cmd_f", this);
 	endfunction : build_phase
 	
 	function void write(result_transaction t);
@@ -35,9 +35,9 @@ class scoreboard extends uvm_subscriber #(result_transaction);
 		bit carry;
 		bit fail;
 		
-		sequence_item cmd;
+		random_command cmd;
 
-		if(seq_f.try_get(cmd)) begin
+		if(cmd_f.try_get(cmd)) begin
 			
 			carry = 0;
 			expected_alu_flags = 0;
