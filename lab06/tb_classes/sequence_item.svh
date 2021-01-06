@@ -23,4 +23,11 @@ class sequence_item extends uvm_sequence_item;
 	`uvm_field_int(data_error, UVM_ALL_ON)
 `uvm_field_utils_end
 
+   	virtual function string convert2string();
+	   	string s;
+     	s = $sformatf("A_data: %8h  B_data: %8h tester_op: %s opcode: %s sent_4b_CRC %1h data_error: %1b",
+	     			   A_data, B_data, tester_op.name(), opcode.name(), sent_4b_CRC, data_error);
+	   	return s;
+   	endfunction : convert2string
+
 endclass : sequence_item
