@@ -39,16 +39,6 @@ initial begin : clock_gen
 end : clock_gen
 */
 
-//initial begin : wait_for_reset
-//	forever begin
-//		if(reset !== 1) begin
-//			rst_n = reset;
-//			wait(reset == 1);
-//			rst_n = 1;
-//		end
-//	end
-//end : wait_for_reset
-
 task reset_alu();
 	rst_n = 1'b0;
 	@(negedge clk); @(negedge clk);
@@ -176,9 +166,8 @@ task read_serial_sin(
 	byte_type_t byte_type;
 	A = 0;
 	B = 0;
-	
-	//FIXME check this out after creating scoreboard maaaaan 
-	//wait(result_read);
+
+	wait(result_read);
 	
 	read_byte_sin(byte_type, d, crc,  op);
 	if(byte_type == DATA) B [31 : 24] = d;
@@ -322,21 +311,6 @@ task read_serial_sout(
 	result_read = 1;
 	@(negedge clk);
 endtask
-
-//FIXME fix the second monitor
-
-//result_monitor result_monitor_h;
-//result_transaction result;
-//
-//initial begin : result_monitor_thread
-//	result = new("result");
-//	forever begin
-//	
-//		read_serial_sout(result.C_data, result.alu_flags, result.rec_3b_CRC, result.err_flags, result.parity_bit);
-//		result_monitor_h.write_to_monitor(result);
-//	
-//	end
-//end : result_monitor_thread
 
 endinterface : do_alu_if
 	

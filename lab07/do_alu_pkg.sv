@@ -64,10 +64,13 @@ endfunction
 
 	// Configuration object
 	`include "do_alu_config_obj.svh"
-	// Sequence item
+	// Sequence items
 	`include "do_alu_item.svh"
-	// Monitor
+	`include "do_alu_result_item.svh"
+	// Monitors
 	`include "do_alu_monitor.svh"
+	`include "do_alu_command_monitor.svh"
+	`include "do_alu_result_monitor.svh"
 	// Coverage Collector
 	`include "do_alu_coverage_collector.svh"
 	// Driver

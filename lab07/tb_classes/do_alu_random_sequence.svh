@@ -28,8 +28,9 @@ class do_alu_random_sequence extends do_alu_base_sequence;
 
 	// Sequence body
 	task body();
-
 		`uvm_create(seq_item)
+		`uvm_info("RESETTING ALU", "START", UVM_MEDIUM)
+		`uvm_rand_send_with(seq_item, {tester_op == rst_op_test;})
 		`uvm_info("RANDOM_SEQ", "START", UVM_MEDIUM)
 		
 		repeat(10000) begin : tester_loop

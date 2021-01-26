@@ -104,7 +104,6 @@ class do_alu_coverage_collector extends uvm_component;
 	endfunction : build_phase
 
 	function void write_collected_item(do_alu_item item);
-		//fixme add the task call to vif(bfm) - idk, not neccessary I guess
 		m_collected_item = item;
 		A_data = $unsigned(m_collected_item.A_data);
 		B_data = $unsigned(m_collected_item.B_data);
