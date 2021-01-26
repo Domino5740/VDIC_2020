@@ -61,7 +61,6 @@ class do_alu_driver extends uvm_driver #(do_alu_item);
 			seq_item_port.get_next_item(req);
 			$cast(rsp, req.clone());
 			rsp.set_id_info(req);
-
 			// Drive current transaction
 			fork
 				// Drive the transaction

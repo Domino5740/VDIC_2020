@@ -80,9 +80,12 @@ endfunction
 	`include "do_alu_env.svh"
 	// Sequence library
 	`include "do_alu_seq_lib.svh"
-	// Base test
+	// sequences
+	`include "do_alu_random_sequence.svh"
+	`include "do_alu_minmax_sequence.svh"
+	// tests
 	`include "do_alu_base_test.svh"
-	// Example test
-	`include "do_alu_example_test.svh"
+	`include "do_alu_random_test.svh"
+	`include "do_alu_minmax_test.svh"
 
 endpackage : do_alu_pkg

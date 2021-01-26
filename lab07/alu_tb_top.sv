@@ -3,7 +3,7 @@
 * Created by dorlowski on Jan 26, 2021
 * uvc_company = do, uvc_name = alu
 *******************************************************************************/
-
+`timescale 1ns/1ps
 module alu_tb_top;
 
 	import uvm_pkg::*;

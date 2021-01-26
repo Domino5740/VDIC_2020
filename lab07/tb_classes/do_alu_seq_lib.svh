@@ -45,28 +45,4 @@ virtual class do_alu_base_sequence extends uvm_sequence#(do_alu_item);
 
 endclass : do_alu_base_sequence
 
-//------------------------------------------------------------------------------
-//
-// CLASS: do_alu_example_sequence
-//
-//------------------------------------------------------------------------------
-
-class do_alu_example_sequence extends do_alu_base_sequence;
-
-	// Add local random fields and constraints here
-
-	`uvm_object_utils(do_alu_example_sequence)
-
-	function new(string name="do_alu_example_sequence");
-		super.new(name);
-	endfunction : new
-
-	virtual task body();
-		`uvm_do_with(req,
-			{ /* FIXME add constraints here*/ } )
-		//get_response(rsp);
-	endtask : body
-
-endclass : do_alu_example_sequence
-
 `endif // IFNDEF_GUARD_do_alu_seq_lib

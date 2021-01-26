@@ -39,15 +39,15 @@ initial begin : clock_gen
 end : clock_gen
 */
 
-initial begin : wait_for_reset
-	forever begin
-		if(reset !== 1) begin
-			rst_n = reset;
-			wait(reset == 1);
-			rst_n = 1;
-		end
-	end
-end : wait_for_reset
+//initial begin : wait_for_reset
+//	forever begin
+//		if(reset !== 1) begin
+//			rst_n = reset;
+//			wait(reset == 1);
+//			rst_n = 1;
+//		end
+//	end
+//end : wait_for_reset
 
 task reset_alu();
 	rst_n = 1'b0;
@@ -88,7 +88,7 @@ task test_op(input bit [31:0] A, B,
 	A_data = A;
 	B_data = B;
 	new_data = 1;
-	
+
 	case(tester_op_set)
 		rst_op_test: begin
 			reset_alu();
@@ -177,7 +177,8 @@ task read_serial_sin(
 	A = 0;
 	B = 0;
 	
-	wait(result_read);
+	//FIXME check this out after creating scoreboard maaaaan 
+	//wait(result_read);
 	
 	read_byte_sin(byte_type, d, crc,  op);
 	if(byte_type == DATA) B [31 : 24] = d;

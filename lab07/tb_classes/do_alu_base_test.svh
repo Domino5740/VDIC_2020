@@ -40,8 +40,8 @@ class do_alu_base_test extends uvm_test;
 
 	task run_phase(uvm_phase phase);
 		super.run_phase(phase);
-		// HINT Here you can set the drain-time if desired
-		 phase.phase_done.set_drain_time(this, 100ns);
+		// Here you can set the drain-time if desired
+		 //phase.phase_done.set_drain_time(this, 100ns);
 	endtask : run_phase
 
 endclass : do_alu_base_test
