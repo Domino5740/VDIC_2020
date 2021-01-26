@@ -28,6 +28,11 @@
 			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
+			<name>lab07</name>
+			<type>2</type>
+			<location>/home/student/dorlowski/VDIC/lab07</location>
+		</link>
+		<link>
 			<name>DVT Auto-Linked/cad</name>
 			<type>2</type>
 			<locationURI>virtual:/virtual</locationURI>

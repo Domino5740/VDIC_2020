@@ -2,5 +2,6 @@
 # DO NOT explicitly list files/directories in 'dvt_auto_init' sections. Use 'dvt_init' sections instead.
 #+dvt_init_auto
 -uvm
--F ./lab06/dut.f
--F ./lab06/tb.f
+-uvmhome /cad/XCELIUM1909/tools/methodology/UVM/CDNS-1.2/sv
+-F ./lab07/dut.f
+-F ./lab07/tb.f
