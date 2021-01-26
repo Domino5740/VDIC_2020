@@ -42,7 +42,7 @@ class do_alu_driver extends uvm_driver #(do_alu_item);
 	virtual task run_phase(uvm_phase phase);
 		// Driving should be triggered by an initial reset pulse
 		@(negedge m_do_alu_vif.reset)
-			do @(posedge m_do_alu_vif.clock);
+			do @(posedge m_do_alu_vif.clk);
 			while(m_do_alu_vif.reset!==1);
 
 		// Start driving
@@ -55,7 +55,7 @@ class do_alu_driver extends uvm_driver #(do_alu_item);
 
 		forever begin
 			// Don't drive during reset
-			while(m_do_alu_vif.reset!==1) @(posedge m_do_alu_vif.clock);
+			while(m_do_alu_vif.reset!==1) @(posedge m_do_alu_vif.clk);
 
 			// Get the next item from the sequencer
 			seq_item_port.get_next_item(req);
@@ -102,8 +102,7 @@ class do_alu_driver extends uvm_driver #(do_alu_item);
 	endtask : reset_driver
 
 	virtual protected task drive_item(do_alu_item item);
-		// FIXME Drive the item
-		
+		m_do_alu_vif.test_op(item.A_data, item.B_data, item.tester_op, item.opcode);
 	endtask : drive_item
 
 endclass : do_alu_driver

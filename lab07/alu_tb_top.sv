@@ -6,31 +6,17 @@
 
 module alu_tb_top;
 
-	// Import the UVM package
 	import uvm_pkg::*;
-
-	// Import the UVC that we have implemented
 	import do_alu_pkg::*;
-
-	// Import all the needed packages
 	
 
 	// Clock and reset signals
 	reg clock;
 	reg reset;
 
-	// The interface
-	do_alu_if vif(clock,reset);
+	do_alu_if vif(clock, reset);
 
-	// add other interfaces if needed
-
-	// FIXME instantiate the DUT
-	dummy_dut dut(
-		clock,
-		reset,
-		vif.valid,
-		vif.data
-	);
+	mtm_Alu DUT (.clk(clock), .rst_n(vif.rst_n), .sin(vif.sin), .sout(vif.sout));
 
 	initial begin
 		// Propagate the interface to all the components that need it

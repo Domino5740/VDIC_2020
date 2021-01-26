@@ -57,7 +57,7 @@ class do_alu_monitor extends uvm_monitor;
 
 		// Start monitoring only after an initial reset pulse
 		@(negedge m_do_alu_vif.reset)
-			do @(posedge m_do_alu_vif.clock);
+			do @(posedge m_do_alu_vif.clk);
 			while(m_do_alu_vif.reset!==1);
 
 		// Start monitoring
@@ -86,14 +86,17 @@ class do_alu_monitor extends uvm_monitor;
 
 	virtual protected task collect_items();
 		forever begin
-			// FIXME Fill this place with the logic for collecting the data, remove wait(0)
-			wait(0);
+			
+			wait(m_do_alu_vif.new_data);
+			m_collected_item.tester_op = m_do_alu_vif.tester_op_set;
+			m_do_alu_vif.read_serial_sin(m_collected_item.A_data, m_collected_item.B_data, m_collected_item.sent_4b_CRC, m_collected_item.opcode, m_collected_item.data_error);
+		
 			`uvm_info(get_full_name(), $sformatf("Item collected :\n%s", m_collected_item.sprint()), UVM_MEDIUM)
 
 			m_collected_item_port.write(m_collected_item);
 
-			if (m_config_obj.m_checks_enable)
-				perform_item_checks();
+//			if (m_config_obj.m_checks_enable)
+//				perform_item_checks();
 		end
 	endtask : collect_items
 
