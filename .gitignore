@@ -7,4 +7,6 @@
 */INCA_libs_gui/
 */cov_work/
 xcelium.d/
+*/.*
+*/*.shm
 *~
