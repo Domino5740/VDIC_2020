@@ -10,15 +10,15 @@
 //
 //------------------------------------------------------------------------------
 `timescale 1ns/1ps
-interface do_alu_if(input wire clk, input wire reset);//, input wire rst_n);
+interface do_alu_if(input wire clk, input wire reset);
 
-	// Just in case you need it
-	import uvm_pkg::*;
+// Just in case you need it
+import uvm_pkg::*;
 	`include "uvm_macros.svh"
 	
-	// Flags to enable/disable assertions and coverage
-	bit checks_enable=1;
-	bit coverage_enable=1;
+// Flags to enable/disable assertions and coverage
+bit checks_enable=1;
+bit coverage_enable=1;
 
 import do_alu_pkg::*;
 
@@ -30,20 +30,16 @@ bit [31:0] A_data, B_data;
 tester_op_t tester_op_set;
 opcode_t opcode_set;
 
-bit result_read, new_data;
-
-/*
-initial begin : clock_gen
-	clk = 0;
-	forever #10 clk = ~clk;
-end : clock_gen
-*/
+bit result_read = 1;
+bit new_data;
 
 task reset_alu();
 	rst_n = 1'b0;
 	@(negedge clk); @(negedge clk);
 	rst_n = 1'b1;
 	sin = 1'b1;
+	result_read = 1'b1;
+	new_data = 1'b0;
 	@(negedge clk);
 endtask
 
@@ -77,8 +73,10 @@ task test_op(input bit [31:0] A, B,
 	opcode_set = opcode;
 	A_data = A;
 	B_data = B;
+	sin = 1;
 	new_data = 1;
-
+	rst_n = 1;
+	
 	case(tester_op_set)
 		rst_op_test: begin
 			reset_alu();
@@ -118,7 +116,8 @@ task test_op(input bit [31:0] A, B,
 		send_ctl_byte({1'b0, opcode_set, crc_4b});
 	end
 	new_data = 0;
-	#1500;
+	if(tester_op_set != rst_op_test) wait(result_read);
+	else #1500;
 endtask
 
 task read_byte_sin(
@@ -127,31 +126,42 @@ task read_byte_sin(
 	output bit [3:0] crc,
 	output opcode_t op);
 	
+	bt = DATA;
+	op = and_opcode;
 	data_out = 0;
 	crc = 0;
-
-	while(sin != 0) @(negedge clk);
 	
-	@(negedge clk)
+//`uvm_info("read byte", "starting", UVM_MEDIUM)
+
+	while(sin != 0) begin 
+//		`uvm_info("read byte", "waiting for sin = 0", UVM_MEDIUM)
+		@(posedge clk);
+	end
+//	`uvm_info("read byte", "starting reading", UVM_MEDIUM)
+	@(posedge clk)
 	
 		if(sin == 0) begin : read_data_byte
 			bt = DATA;
 			for(int i = 7; i >= 0; i--) begin
-				@(negedge clk) data_out[i] = sin;
+//				`uvm_info("read byte", "reading data", UVM_MEDIUM)
+				@(posedge clk) data_out[i] = sin;
 			end
 		end : read_data_byte
 		else begin: read_ctl_byte
-			@(negedge clk);
+			@(posedge clk);
 			if(sin == 0) bt = CTL;
 			else bt = ERR;
 			for(int i = 2; i >= 0; i--) begin
-				@(negedge clk) op[i] = sin;
+//				`uvm_info("read byte", "reading op", UVM_MEDIUM)
+				@(posedge clk) op[i] = sin;
 			end
 			for(int i = 3; i >= 0; i--) begin
-				@(negedge clk) crc[i] = sin;
+//				`uvm_info("read byte", "reading crc", UVM_MEDIUM)
+				@(posedge clk) crc[i] = sin;
 			end
 		end : read_ctl_byte
-		@(negedge clk);
+		@(posedge clk);
+//		`uvm_info("read byte", "end", UVM_MEDIUM)
 endtask
 
 task read_serial_sin(
@@ -168,6 +178,7 @@ task read_serial_sin(
 	B = 0;
 
 	wait(result_read);
+	result_read = 0;
 	
 	read_byte_sin(byte_type, d, crc,  op);
 	if(byte_type == DATA) B [31 : 24] = d;
@@ -175,56 +186,56 @@ task read_serial_sin(
 		data_error = 1;
 		disable read_serial_sin;
 	end
-	
+//	`uvm_info("READ SERIAL SIN", $sformatf("byte 1 read :%0D", d), UVM_MEDIUM)
 	read_byte_sin(byte_type, d, crc,  op);
 	if(byte_type == DATA) B [23 : 16] = d;
 	else  begin
 		data_error = 1;
 		disable read_serial_sin;
 	end
-	
+//	`uvm_info("READ SERIAL SIN", $sformatf("byte 2 read :%0D", d), UVM_MEDIUM)
 	read_byte_sin(byte_type, d, crc,  op);
 	if(byte_type == DATA) B [15 : 8] = d;
 	else  begin
 		data_error = 1;
 		disable read_serial_sin;
 	end
-	
+//	`uvm_info("READ SERIAL SIN", $sformatf("byte 3 read :%0D", d), UVM_MEDIUM)
 	read_byte_sin(byte_type, d, crc,  op);
 	if(byte_type == DATA) B [7 : 0] = d;
 	else  begin
 		data_error = 1;
 		disable read_serial_sin;
 	end
-	
+//	`uvm_info("READ SERIAL SIN", $sformatf("byte 4 read :%0D", d), UVM_MEDIUM)
 	read_byte_sin(byte_type, d, crc,  op);
 	if(byte_type == DATA) A [31 : 24] = d;
 	else  begin
 		data_error = 1;
 		disable read_serial_sin;
 	end
-	
+//	`uvm_info("READ SERIAL SIN", $sformatf("byte 5 read :%0D", d), UVM_MEDIUM)
 	read_byte_sin(byte_type, d, crc,  op);
 	if(byte_type == DATA) A [23 : 16] = d;
 	else  begin
 		data_error = 1;
 		disable read_serial_sin;
 	end
-	
+//	`uvm_info("READ SERIAL SIN", $sformatf("byte 6 read :%0D", d), UVM_MEDIUM)
 	read_byte_sin(byte_type, d, crc,  op);
 	if(byte_type == DATA) A [15 : 8] = d;
 	else  begin
 		data_error = 1;
 		disable read_serial_sin;
 	end
-	
+//	`uvm_info("READ SERIAL SIN", $sformatf("byte 7 read :%0D", d), UVM_MEDIUM)
 	read_byte_sin(byte_type, d, crc,  op);
 	if(byte_type == DATA) A [7 : 0] = d;
 	else  begin
 		data_error = 1;
 		disable read_serial_sin;
 	end
-	
+//	`uvm_info("READ SERIAL SIN", $sformatf("byte 8 read :%0D", d), UVM_MEDIUM)
 	crc = 0;
 	
 	read_byte_sin(byte_type, d, crc, op);
@@ -288,13 +299,14 @@ task read_serial_sout(
 	byte_type_t byte_type;
 	bit [7:0] d;
 	C = 0;
-	result_read = 0;
 	err_flags = 0;
 		
 	read_byte_sout(byte_type, d, alu_flags, crc, err_flags, parity_bit);
 	if(byte_type == DATA) C [31 : 24] = d;
-	else if(byte_type == ERR) disable read_serial_sout;
-	
+	else if(byte_type == ERR) begin
+		result_read = 1;
+		disable read_serial_sout;
+	end
 	read_byte_sout(byte_type, d, alu_flags, crc, err_flags, parity_bit);
 	C [23 : 16] = d;
 	
@@ -313,19 +325,3 @@ task read_serial_sout(
 endtask
 
 endinterface : do_alu_if
-	
-//	//You can add covergroups in interfaces
-//	covergroup signal_coverage@(posedge clock);
-//		//add coverpoints here
-//	endgroup
-//	// You must instantiate the covergroup to collect coverage
-//	signal_coverage sc=new;
-//
-//	// You can add SV assertions in interfaces
-//	my_assertion:assert property (
-//			@(posedge clock) disable iff (reset === 1'b0 || !checks_enable)
-//			valid |-> (data!==8'bXXXX_XXXX)
-//		)
-//	else
-//		`uvm_error("ERR_TAG","Error")
-

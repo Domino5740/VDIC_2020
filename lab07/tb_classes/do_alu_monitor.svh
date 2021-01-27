@@ -45,7 +45,6 @@ virtual class do_alu_monitor extends uvm_monitor;
 		@(negedge m_do_alu_vif.reset)
 			do @(posedge m_do_alu_vif.clk);
 			while(m_do_alu_vif.reset!==1);
-
 		// Start monitoring
 		forever begin
 			fork
@@ -59,9 +58,7 @@ virtual class do_alu_monitor extends uvm_monitor;
 					rst_mon_thread = process::self();
 					@(negedge m_do_alu_vif.reset) begin
 						// Interrupt current item at reset
-						
 						if(main_thread) main_thread.kill();
-						//reset_monitor();
 					end
 				end
 			join_any

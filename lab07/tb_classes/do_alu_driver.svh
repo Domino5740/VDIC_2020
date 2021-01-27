@@ -44,7 +44,6 @@ class do_alu_driver extends uvm_driver #(do_alu_item);
 		@(negedge m_do_alu_vif.reset)
 			do @(posedge m_do_alu_vif.clk);
 			while(m_do_alu_vif.reset!==1);
-
 		// Start driving
 		get_and_drive();
 	endtask : run_phase
@@ -79,8 +78,8 @@ class do_alu_driver extends uvm_driver #(do_alu_item);
 						// Interrupt current transaction at reset
 						if(main_thread) main_thread.kill();
 						// Do reset
-						reset_signals();
-						reset_driver();
+//						reset_signals();
+//						reset_driver();
 					end
 				end
 			join_any
@@ -91,14 +90,14 @@ class do_alu_driver extends uvm_driver #(do_alu_item);
 //			seq_item_port.put_response(rsp);
 		end
 	endtask : get_and_drive
-
-	virtual protected task reset_signals();
-		// Reset the signals to their default values
-	endtask : reset_signals
-
-	virtual protected task reset_driver();
-		// Reset driver specific state variables (e.g. counters, flags, buffers, queues, etc.)
-	endtask : reset_driver
+//
+//	virtual protected task reset_signals();
+//		// Reset the signals to their default values
+//	endtask : reset_signals
+//
+//	virtual protected task reset_driver();
+//		// Reset driver specific state variables (e.g. counters, flags, buffers, queues, etc.)
+//	endtask : reset_driver
 
 	virtual protected task drive_item(do_alu_item item);
 		m_do_alu_vif.test_op(item.A_data, item.B_data, item.tester_op, item.opcode);

@@ -12,7 +12,7 @@
 
 #------------------------------------------------------------------------------
 # The list of tests; in GUI mode only the first test is started.
-# TESTS=(random_test);
+# TESTS=(do_alu_random_test);
 TESTS=(do_alu_random_test do_alu_minmax_test);
 #------------------------------------------------------------------------------
 # MAIN

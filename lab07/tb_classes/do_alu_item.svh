@@ -15,20 +15,6 @@
 
 class  do_alu_item extends uvm_sequence_item;
 
-
-//	// This bit should be set when you want all the fields to be
-//	// constrained to some default values or ranges at randomization
-//	rand bit default_values;
-//	rand int m_data;
-//  //nie wiem o co chodzi tbh raczej mi to niepotrzebne
-//	//  it is a good practice to define a c_default_values_*
-//	// constraint for each field in which you constrain the field to some
-//	// default value or range. You can disable these constraints using
-//	// set_constraint_mode() before you call the randomize() function
-//	constraint c_default_values_data {
-//		m_data inside {[1:10]};
-//	}
-	
 	rand bit signed [31:0] A_data;
 	rand bit signed [31:0] B_data;
 	rand tester_op_t tester_op;

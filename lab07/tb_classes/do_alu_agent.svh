@@ -23,6 +23,7 @@ class do_alu_agent extends uvm_agent;
 	do_alu_command_monitor m_command_monitor;
 	do_alu_result_monitor m_result_monitor;
 	do_alu_coverage_collector m_coverage_collector;
+	do_alu_scoreboard m_scoreboard;
 	
 	`uvm_component_utils(do_alu_agent)
 
@@ -43,7 +44,7 @@ class do_alu_agent extends uvm_agent;
 		// Create the monitors
 		m_command_monitor = do_alu_command_monitor::type_id::create("m_command_monitor", this);
 		m_result_monitor = do_alu_result_monitor::type_id::create("m_result_monitor", this);
-		
+		m_scoreboard = do_alu_scoreboard::type_id::create("m_scoreboard", this);
 		if(m_config_obj.m_coverage_enable) begin
 			m_coverage_collector = do_alu_coverage_collector::type_id::create("m_coverage_collector", this);
 		end
@@ -65,6 +66,8 @@ class do_alu_agent extends uvm_agent;
 		if(m_config_obj.m_is_active == UVM_ACTIVE) begin
 			m_driver.seq_item_port.connect(m_sequencer.seq_item_export);
 		end
+	    m_command_monitor.m_collected_item_port.connect(m_scoreboard.seq_f.analysis_export);
+        m_result_monitor.m_collected_item_port.connect(m_scoreboard.m_monitor_port);
 	endfunction : connect_phase
 
 endclass : do_alu_agent

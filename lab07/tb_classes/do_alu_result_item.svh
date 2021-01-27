@@ -22,13 +22,12 @@ class  do_alu_result_item extends uvm_sequence_item;
 	bit parity_bit;
 
 	`uvm_object_utils_begin(do_alu_result_item)
-		`uvm_field_int(C_data, UVM_DEFAULT)
-		`uvm_field_int(alu_flags, UVM_DEFAULT)
-		`uvm_field_int(rec_3b_CRC, UVM_DEFAULT)
-		`uvm_field_int(err_flags, UVM_DEFAULT)
-		`uvm_field_int(parity_bit, UVM_DEFAULT | UVM_UNSIGNED)
+		`uvm_field_int(C_data, UVM_ALL_ON)
+		`uvm_field_int(alu_flags, UVM_ALL_ON)
+		`uvm_field_int(rec_3b_CRC, UVM_ALL_ON)
+		`uvm_field_int(err_flags, UVM_ALL_ON)
+		`uvm_field_int(parity_bit, UVM_ALL_ON)
 	`uvm_object_utils_end
-	// HINT if not working check this uvm_default
 
 	function new (string name = "do_alu_result_item");
 		super.new(name);

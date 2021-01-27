@@ -27,13 +27,13 @@ module alu_tb_top;
 
 	// Generate clock
 	always
-		#5 clock=~clock;
+		#10 clock=~clock;
 
 	// Generate reset
 	initial begin
 		reset <= 1'b1;
 		clock <= 1'b1;
-		#21 reset <= 1'b0;
-		#51 reset <= 1'b1;
+		#41 reset <= 1'b0;
+		#101 reset <= 1'b1;
 	end
 endmodule

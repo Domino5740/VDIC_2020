@@ -51,7 +51,7 @@ class do_alu_coverage_collector extends uvm_component;
 		option.name = "cg_zeros_or_ones_on_ops";
 		
 		all_ops : coverpoint tester_op_set {
-			ignore_bins null_ops = {rst_op_test};
+			ignore_bins null_ops = {rst_op_test, bad_data_op_test};
 		}
 		a_leg: coverpoint A_data {
 			bins zeros  = {'h00000000};
@@ -90,7 +90,6 @@ class do_alu_coverage_collector extends uvm_component;
 		super.new(name, parent);
 		op_cov = new;
 		zeros_or_ones_on_ops = new();
-		//item_cg.set_inst_name({get_full_name(), ".item_cg"});
 	endfunction : new
 
 	virtual function void build_phase(uvm_phase phase);

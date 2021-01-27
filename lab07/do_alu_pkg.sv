@@ -59,8 +59,6 @@ function bit [3:0] calc_crc_4b(input bit [67:0] data_in);
 	return crc_out;
 	
 endfunction
-	
-//TODO ALWAYS CHECK THIS WHEN ADDING NEW FILES
 
 	// Configuration object
 	`include "do_alu_config_obj.svh"
@@ -77,6 +75,8 @@ endfunction
 	`include "do_alu_driver.svh"
 	// Sequencer
 	`include "do_alu_sequencer.svh"
+	// Scoreboard
+	`include "do_alu_scoreboard.svh"
 	// Agent
 	`include "do_alu_agent.svh"
 	// Environment

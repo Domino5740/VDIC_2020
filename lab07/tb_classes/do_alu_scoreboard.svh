@@ -1,7 +1,29 @@
-class scoreboard extends uvm_subscriber #(result_transaction);
-	`uvm_component_utils(scoreboard)
+/******************************************************************************
+* DVT CODE TEMPLATE: scoreboard
+* Created by dorlowski on Jan 26, 2021
+* uvc_company = do, uvc_name = alu
+*******************************************************************************/
+
+`ifndef IFNDEF_GUARD_do_alu_scoreboard
+`define IFNDEF_GUARD_do_alu_scoreboard
+
+//------------------------------------------------------------------------------
+//
+// CLASS: do_alu_scoreboard
+//
+//------------------------------------------------------------------------------
+class do_alu_scoreboard extends uvm_component;
+	`uvm_component_utils(do_alu_scoreboard)
 	
-	uvm_tlm_analysis_fifo #(sequence_item) seq_f;
+	protected do_alu_result_item m_received_result_item;
+	
+	// Using suffix to handle more ports
+	`uvm_analysis_imp_decl(_collected_item)
+
+	// Connection to the monitor
+	uvm_analysis_imp_collected_item#(do_alu_result_item, do_alu_scoreboard) m_monitor_port;
+	
+	uvm_tlm_analysis_fifo #(do_alu_item) seq_f;
 	
 	function new(string name, uvm_component parent);
 		super.new(name, parent);
@@ -9,9 +31,10 @@ class scoreboard extends uvm_subscriber #(result_transaction);
 	
 	function void build_phase(uvm_phase phase);
 		seq_f = new("seq_f", this);
+		m_monitor_port = new("m_monitor_port",this);
 	endfunction : build_phase
 	
-	function void write(result_transaction t);
+	function void write_collected_item(do_alu_result_item result_item);
 		
 		bit signed [31:0] A_data, B_data;
 		opcode_t opcode;
@@ -35,9 +58,13 @@ class scoreboard extends uvm_subscriber #(result_transaction);
 		bit carry;
 		bit fail;
 		
-		sequence_item cmd;
-
+		do_alu_item cmd;
+		m_received_result_item = result_item;
+		
 		if(seq_f.try_get(cmd)) begin
+			
+			`uvm_info(get_full_name(), $sformatf("Item collected :\n%s", cmd.sprint()), UVM_HIGH)
+			`uvm_info(get_full_name(), $sformatf("Item collected :\n%s", m_received_result_item.sprint()), UVM_HIGH)
 			
 			carry = 0;
 			expected_alu_flags = 0;
@@ -92,17 +119,19 @@ class scoreboard extends uvm_subscriber #(result_transaction);
 				expected_3b_CRC = 0;
 			end
 			
-			received_C_data = t.C_data;
-			received_alu_flags = t.alu_flags;
-			received_3b_CRC = t.rec_3b_CRC;
-			received_err_flags = t.err_flags;
-			received_parity_bit = t.parity_bit;
+			received_C_data = m_received_result_item.C_data;
+			received_alu_flags = m_received_result_item.alu_flags;
+			received_3b_CRC = m_received_result_item.rec_3b_CRC;
+			received_err_flags = m_received_result_item.err_flags;
+			received_parity_bit = m_received_result_item.parity_bit;
 			
 			if(expected_err_flags != 0 && (received_err_flags != expected_err_flags || received_parity_bit != expected_parity_bit)) fail = 1;
 			else if((received_alu_flags != expected_alu_flags) || received_C_data != expected_C_data || received_3b_CRC != expected_3b_CRC) fail = 1;
 			
 			if(fail) $error("FAILED: A: %0h B : %0h op: %s C: %0h", A_data, B_data, opcode.name(), received_C_data);
 		end
-	endfunction : write
+	endfunction : write_collected_item
 
-endclass : scoreboard
+endclass : do_alu_scoreboard
+
+`endif // IFNDEF_GUARD_do_alu_scoreboard
